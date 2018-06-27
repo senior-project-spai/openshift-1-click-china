@@ -2,13 +2,13 @@
 #### 可配置项：
 查看config.yml文件
 
-        CHANGEREPO: true
-        HOSTNAME: os39.test.it.example.com
+    CHANGEREPO: true
+    HOSTNAME: os39.test.it.example.com
 
-        Change_Base_Registry: false
-        Harbor_Url: harbor.apps.it.example.com
+    Change_Base_Registry: false
+    Harbor_Url: harbor.apps.it.example.com
 
-        FULL_INSTALL: false
+    FULL_INSTALL: false
 说明:
 - CHANGEREPO: 是否使用files/all.repo替换系统默认repo源
 - HOSTNAME：安装Openshift的主机的hostname，也是集群的访问域名
