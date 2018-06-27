@@ -1,0 +1,8 @@
+---
+CHANGEREPO: true
+HOSTNAME: os39.test.it.example.com
+
+Change_Base_Registry: false
+Harbor_Url: harbor.apps.it.example.com
+
+FULL_INSTALL: false

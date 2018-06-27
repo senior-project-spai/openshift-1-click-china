@@ -1,0 +1,63 @@
+[OSEv3:children]
+masters
+nodes
+etcd
+nfs
+
+[OSEv3:vars]
+ansible_ssh_user=root
+openshift_deployment_type=origin
+deployment_type=origin
+openshift_release=v3.9
+
+{% if Change_Base_Registry == true %}
+oreg_url={{ Harbor_Url }}/openshift/origin-${component}:${version}
+system_images_registry={{ Harbor_Url }}
+openshift_examples_modify_imagestreams=true
+openshift_docker_additional_registries={{ Harbor_Url }}
+openshift_service_catalog_image_prefix={{ Harbor_Url }}/openshift/origin-
+openshift_metrics_image_prefix={{ Harbor_Url }}/openshift/origin-
+openshift_logging_image_prefix={{ Harbor_Url }}/openshift/origin-
+ansible_service_broker_image_prefix={{ Harbor_Url }}/openshift/origin-
+ansible_service_broker_etcd_image_prefix={{ Harbor_Url }}/openshift/origin-
+{% endif %}
+
+openshift_enable_service_catalog=false
+template_service_broker_install=false
+
+openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/origin/master/htpasswd'}]
+openshift_master_htpasswd_file=/etc/origin/master/htpasswd
+openshift_docker_options="-l warn --ipv6=false --insecure-registry=0.0.0.0/0 --registry-mirror=https://docker.mirrors.ustc.edu.cn  --log-opt max-size=1M --log-opt max-file=3"
+openshift_disable_check=memory_availability,disk_availability,package_availability,package_update,docker_image_availability,docker_storage_driver,docker_storage
+openshift_master_default_subdomain=apps.{{ HOSTNAME }}
+
+{% if FULL_INSTALL == true %}
+openshift_metrics_install_metrics=true
+openshift_hosted_metrics_public_url=https://hawkular-metrics.apps.{{ HOSTNAME }}/hawkular/metrics
+
+openshift_logging_install_logging=true
+
+openshift_hosted_prometheus_deploy=true
+
+grafana_namespace=openshift-grafana
+grafana_user=grafana
+grafana_password=grafana
+grafana_datasource_name="example"
+grafana_prometheus_namespace="openshift-metrics"
+grafana_prometheus_sa=prometheus
+grafana_node_exporter=false
+grafana_graph_granularity="2m"
+
+{% endif %}
+
+
+[masters]
+{{ HOSTNAME }}
+[etcd]
+{{ HOSTNAME }}
+
+[nfs]
+{{ HOSTNAME }}
+
+[nodes]
+{{ HOSTNAME }} openshift_node_labels="{'region': 'infra', 'zone': 'default'}" openshift_schedulable=true

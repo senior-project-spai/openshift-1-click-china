@@ -1,0 +1,20 @@
+---
+- hosts: localhost
+  vars_files:
+    - ./config.yml
+    - vars/main.yml
+
+  become: yes
+  connection: local
+  tasks:
+
+#    - include: tasks/update_repo.yml
+#      when: true == {{CHANGEREPO}}
+
+    - include: tasks/common_set.yml
+
+    - include: tasks/install.yml
+
+  handlers:
+    - include: handlers/main.yml
+
