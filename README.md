@@ -25,8 +25,9 @@
     
     cd openshift-oneclick-allinone
     
-#### 4. 运行部署
-    
+#### 4. 运行部署(必须切到root账号)
+
+    sudo su
     /bin/bash deploy_openshift.sh
     
 #### 5. 本地绑定hosts
