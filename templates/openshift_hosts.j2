@@ -33,14 +33,14 @@ openshift_disable_check=memory_availability,disk_availability,package_availabili
 openshift_master_default_subdomain=apps.{{ HOSTNAME }}
 
 {% if FULL_INSTALL == true %}
-openshift_metrics_install_metrics=true
+openshift_metrics_install_metrics=false
 openshift_metrics_image_version=v3.9
 openshift_hosted_metrics_public_url=https://hawkular-metrics.apps.{{ HOSTNAME }}/hawkular/metrics
 
-openshift_logging_install_logging=true
+openshift_logging_install_logging=false
 openshift_logging_image_version=v3.9
 
-openshift_hosted_prometheus_deploy=true
+openshift_hosted_prometheus_deploy=false
 
 grafana_namespace=openshift-grafana
 grafana_user=grafana
