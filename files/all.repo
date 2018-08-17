@@ -15,7 +15,7 @@ gpgcheck=0
 
 [openshift]
 name=Openshift
-baseurl=http://mirrors.ustc.edu.cn/centos/$releasever/paas/$basearch/openshift-origin/
+baseurl=http://mirrors.ustc.edu.cn/centos/$releasever/paas/$basearch/openshift-origin39/
 gpgcheck=0
 
 [epel]
