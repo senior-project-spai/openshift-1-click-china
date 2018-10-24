@@ -7,7 +7,7 @@ then
     yum clean all
 fi
 current_path=`pwd`
-yum install ansible -y
+rpm -i tools/ansible-2.4.6.0-1.el7.ans.noarch.rpm
 ansible-playbook playbook.yml
 cd $current_path/openshift-ansible-playbook
 ansible-playbook playbooks/prerequisites.yml
