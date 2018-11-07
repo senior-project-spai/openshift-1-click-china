@@ -39,7 +39,7 @@ class OCGroup(OpenShiftCLI):
         result = self._get(self.kind, self.config.name)
         if result['returncode'] == 0:
             self.group = Group(content=result['results'][0])
-        elif 'groups \"{}\" not found'.format(self.config.name) in result['stderr']:
+        elif 'groups.user.openshift.io \"{}\" not found'.format(self.config.name) in result['stderr']:
             result['returncode'] = 0
             result['results'] = [{}]
 
@@ -64,7 +64,7 @@ class OCGroup(OpenShiftCLI):
     # pylint: disable=too-many-return-statements,too-many-branches
     @staticmethod
     def run_ansible(params, check_mode=False):
-        '''run the idempotent ansible code'''
+        '''run the oc_group module'''
 
         gconfig = GroupConfig(params['name'],
                               params['namespace'],

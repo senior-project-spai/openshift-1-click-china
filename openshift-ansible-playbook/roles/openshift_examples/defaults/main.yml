@@ -6,9 +6,7 @@ openshift_examples_load_db_templates: true
 openshift_examples_load_xpaas: "{{ openshift_deployment_type != 'origin' }}"
 openshift_examples_load_quickstarts: true
 
-content_version: "{{ openshift.common.examples_content_version }}"
-
-examples_base: "{{ openshift.common.config_base if openshift_is_containerized | bool else '/usr/share/openshift' }}/examples"
+examples_base: "{{ openshift.common.config_base if openshift_is_atomic | bool else '/usr/share/openshift' }}/examples"
 image_streams_base: "{{ examples_base }}/image-streams"
 centos_image_streams:
   - "{{ image_streams_base }}/image-streams-centos7.json"
@@ -24,8 +22,10 @@ infrastructure_origin_base: "{{ examples_base }}/infrastructure-templates/origin
 infrastructure_enterprise_base: "{{ examples_base }}/infrastructure-templates/enterprise"
 cockpit_ui_base: "{{ examples_base }}/infrastructure-templates/enterprise"
 
-
 openshift_examples_import_command: "create"
-
-openshift_examples_registryurl: "{{ oreg_url_master | default(oreg_url) | default('') }}"
 registry_host: "{{ openshift_examples_registryurl.split('/')[0] if '.' in openshift_examples_registryurl.split('/')[0] else '' }}"
+
+openshift_hosted_images_dict:
+  origin: 'docker.io/openshift/origin-${component}:${version}'
+  openshift-enterprise: 'registry.redhat.io/openshift3/ose-${component}:${version}'
+openshift_examples_registryurl: "{{ oreg_url | default(openshift_hosted_images_dict[openshift_deployment_type]) }}"

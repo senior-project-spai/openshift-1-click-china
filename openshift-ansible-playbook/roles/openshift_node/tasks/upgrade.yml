@@ -4,8 +4,6 @@
 # - openshift_is_atomic
 # - node_config_hook
 # - openshift_pkg_version
-# - openshift_is_containerized
-# - openshift_release
 
 # tasks file for openshift_node_upgrade
 
@@ -21,12 +19,42 @@
   - l_docker_upgrade is defined
   - l_docker_upgrade | bool
 
+- name: Ensure cri-o is updated
+  package:
+    name: "{{ pkg_list | join (',') }}"
+    state: latest
+  when:
+  - openshift_use_crio | bool
+  register: crio_update
+  until: crio_update is succeeded
+  vars:
+    pkg_list:
+    - cri-o
+    - cri-tools
+
+- name: Remove CRI-O default configuration files
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+  - "/etc/cni/net.d/200-loopback.conf"
+  - "/etc/cni/net.d/100-crio-bridge.conf"
+  when: crio_update is changed
+
+- name: Ensure crictl.yaml runtime-endpoint is updated
+  yedit:
+    src: /etc/crictl.yaml
+    key: runtime-endpoint
+    value: "{{ openshift_crio_var_sock }}"
+  when:
+  - openshift_use_crio | default(False) | bool
+
 - name: install pre-pulled rpms.
   import_tasks: upgrade/rpm_upgrade_install.yml
-  vars:
-    openshift_version: "{{ openshift_pkg_version | default('') }}"
-  when: not openshift_is_containerized | bool
+  when: not openshift_is_atomic | bool
 
+# TODO(michaelgugino): Remove in 3.12
+- import_tasks: selinux_container_cgroup.yml
 
 - include_tasks: "{{ node_config_hook }}"
   when: node_config_hook is defined
@@ -36,21 +64,30 @@
 - import_tasks: dnsmasq_install.yml
 - import_tasks: dnsmasq.yml
 
+- name: ensure dnsmasq is always restarted
+  debug:
+    msg: "Restarting dnsmasq"
+  # changed_when: True required for debug tasks to trigger handlers.
+  changed_when: True
+  notify:
+  - reload systemd units
+  - restart dnsmasq
+
+# Need to flush handlers here so dnsmasq is restarted and daemon-reload
+- meta: flush_handlers
+
 # Restart all services
 - import_tasks: upgrade/restart.yml
 
-- name: Wait for node to be ready
-  oc_obj:
-    state: list
-    kind: node
-    name: "{{ openshift.common.hostname | lower }}"
-  register: node_output
+- name: Approve node certificates when bootstrapping
+  oc_csr_approve:
+    oc_bin: "{{ hostvars[groups.oo_first_master.0]['first_master_client_binary'] }}"
+    oc_conf: "{{ openshift.common.config_base }}/master/admin.kubeconfig"
+    node_list:
+    - "{{ l_kubelet_node_name | lower }}"
   delegate_to: "{{ groups.oo_first_master.0 }}"
-  until: node_output.results.returncode == 0 and node_output.results.results[0].status.conditions | selectattr('type', 'match', '^Ready$') | map(attribute='status') | join | bool == True
-  # Give the node two minutes to come back online.
-  retries: 24
-  delay: 5
+  register: node_upgrade_oc_csr_approve
+  retries: 30
+  until: node_upgrade_oc_csr_approve is succeeded
 
 - import_tasks: journald.yml
-
-- meta: flush_handlers

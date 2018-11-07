@@ -19,11 +19,14 @@ ETCD_LISTEN_CLIENT_URLS={{ etcd_listen_client_urls }}
 #ETCD_MAX_SNAPSHOTS=5
 #ETCD_MAX_WALS=5
 #ETCD_CORS=
+{% if etcd_cipher_suites is defined and etcd_cipher_suites %}
+ETCD_CIPHER_SUITES="{{ etcd_cipher_suites }}"
+{% endif %}
 
 
 #[cluster]
 ETCD_INITIAL_ADVERTISE_PEER_URLS={{ etcd_initial_advertise_peer_urls }}
-{% if etcd_is_thirdparty %}
+{% if etcd_is_thirdparty | bool %}
 # TODO: This needs to be altered to support the correct etcd instances
 ETCD_INITIAL_CLUSTER={{ etcd_hostname}}={{ etcd_initial_advertise_peer_urls }}
 ETCD_INITIAL_CLUSTER_STATE={{ etcd_initial_cluster_state }}

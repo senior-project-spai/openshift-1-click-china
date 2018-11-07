@@ -6,25 +6,14 @@
     - openshift_deployment_type == 'openshift-enterprise'
     - not openshift_use_crio | bool
 
+- name: Start node image prepull
+  import_tasks: prepull.yml
+
 - import_tasks: dnsmasq_install.yml
 - import_tasks: dnsmasq.yml
 
 - name: setup firewall
   import_tasks: firewall.yml
-
-- name: Update journald config
-  import_tasks: journald.yml
-
-#### Disable SWAP #####
-# https://docs.openshift.com/container-platform/3.4/admin_guide/overcommit.html#disabling-swap-memory
-# swapoff is a custom module in lib_utils that comments out swap entries in
-# /etc/fstab and runs swapoff -a, if necessary.
-- name: Disable swap
-  swapoff: {}
-  when: openshift_disable_swap | default(true) | bool
-
-- name: include node installer
-  import_tasks: install.yml
 
 - name: Restart cri-o
   systemd:
@@ -42,7 +31,19 @@
     name: NetworkManager
     enabled: yes
     state: restarted
-  when: openshift_node_bootstrap | bool
+
+- name: include node installer
+  import_tasks: install.yml
+
+- name: Update journald config
+  import_tasks: journald.yml
+
+#### Disable SWAP #####
+# https://docs.openshift.com/container-platform/3.4/admin_guide/overcommit.html#disabling-swap-memory
+# swapoff is a custom module in lib_utils that comments out swap entries in
+# /etc/fstab and runs swapoff -a, if necessary.
+- name: Disable swap
+  swapoff: {}
 
 # The atomic-openshift-node service will set this parameter on
 # startup, but if the network service is restarted this setting is
@@ -53,7 +54,14 @@
     sysctl_file: "/etc/sysctl.d/99-openshift.conf"
     reload: yes
 
+- import_tasks: selinux_container_cgroup.yml
+
 - import_tasks: registry_auth.yml
+
+- import_tasks: prepull_check.yml
+
+- import_tasks: copy_image_to_ostree.yml
+  when: openshift_is_atomic | bool
 
 - name: include standard node config
   import_tasks: config.yml
@@ -61,11 +69,9 @@
 #### Storage class plugins here ####
 - name: NFS storage plugin configuration
   import_tasks: storage_plugins/nfs.yml
-  tags:
-    - nfs
 
 - name: GlusterFS storage plugin configuration
-  import_tasks: storage_plugins/glusterfs.yml
+  import_tasks: glusterfs.yml
   when: "'glusterfs' in osn_storage_plugin_deps"
 
 - name: Ceph storage plugin configuration
@@ -77,6 +83,3 @@
   when: "'iscsi' in osn_storage_plugin_deps"
 
 ##### END Storage #####
-
-- import_tasks: config/workaround-bz1331590-ovs-oom-fix.yml
-  when: openshift_node_use_openshift_sdn | default(true) | bool

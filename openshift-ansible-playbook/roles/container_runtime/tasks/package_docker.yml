@@ -1,16 +1,10 @@
 ---
-- include_tasks: common/pre.yml
+- import_tasks: common/pre.yml
 
 # In some cases, some services may be run as containers and docker may still
 # be installed via rpm.
-- include_tasks: common/atomic_proxy.yml
-  when:
-  - >
-    (openshift_use_system_containers | default(False)) | bool
-    or (openshift_use_etcd_system_container | default(False)) | bool
-    or (openshift_use_openvswitch_system_container | default(False)) | bool
-    or (openshift_use_node_system_container | default(False)) | bool
-    or (openshift_use_master_system_container | default(False)) | bool
+- import_tasks: common/atomic_proxy.yml
+  when: openshift_is_atomic
 
 - name: Get current installed Docker version
   command: "{{ repoquery_installed }} --qf '%{version}' docker"
@@ -21,21 +15,24 @@
   changed_when: false
 
 # Some basic checks to ensure the role will complete
-- include_tasks: docker_sanity.yml
+- import_tasks: docker_sanity.yml
 
 # Make sure Docker is installed, but does not update a running version.
 # Docker upgrades are handled by a separate playbook.
 # Note: The curr_docker_version.stdout check can be removed when https://github.com/ansible/ansible/issues/33187 gets fixed.
 - name: Install Docker
   package:
-    name: "docker{{ '-' + docker_version if docker_version is defined else '' }}"
+    name: "{{ pkg_list | join(',') }}"
     state: present
   when:
   - not (openshift_is_atomic | bool)
-  - not (curr_docker_version is skipped)
-  - not (curr_docker_version.stdout != '')
   register: result
   until: result is succeeded
+  vars:
+    pkg_list:
+    - "docker{{ '-' + docker_version if docker_version is defined else '' }}"
+    - atomic
+    - skopeo
 
 - block:
   # Extend the default Docker service unit file when using iptables-services
@@ -52,7 +49,10 @@
     - restart container runtime
   when: not (os_firewall_use_firewalld | default(False)) | bool
 
-- stat: path=/etc/sysconfig/docker
+- stat:
+    path: /etc/sysconfig/docker
+    get_checksum: false
+    get_mime: false
   register: docker_check
 
 - name: Set registry params
@@ -121,7 +121,10 @@
   notify:
   - restart container runtime
 
-- stat: path=/etc/sysconfig/docker-network
+- stat:
+    path: /etc/sysconfig/docker-network
+    get_checksum: false
+    get_mime: false
   register: sysconfig_docker_network_check
 
 - name: Configure Docker Network OPTIONS
@@ -157,4 +160,15 @@
 - set_fact:
     docker_service_status_changed: "{{ (r_docker_package_docker_start_result is changed) and (r_docker_already_running_result.stdout != 'ActiveState=active' ) }}"
 
-- include_tasks: common/post.yml
+- name: Check for docker_storage_path/overlay2
+  stat:
+    path: "{{ docker_storage_path }}/overlay2"
+  register: dsp_stat
+
+- name: Fixup SELinux permissions for docker
+  shell: |
+           semanage fcontext -a -e /var/lib/docker/overlay2 "{{ docker_storage_path }}/overlay2"
+           restorecon -R -v "{{ docker_storage_path }}/overlay2"
+  when: dsp_stat.stat.exists
+
+- import_tasks: common/post.yml

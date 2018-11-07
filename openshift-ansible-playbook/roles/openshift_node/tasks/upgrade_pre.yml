@@ -7,26 +7,14 @@
 
 - import_tasks: registry_auth.yml
 
+# Prepull the node and pod image, it's used by lots of components
+- import_tasks: prepull.yml
+
 - name: update package meta data to speed install later.
   command: "{{ ansible_pkg_mgr }} makecache"
   register: result
   until: result is succeeded
-  when: not openshift_is_containerized | bool
-
-- name: Check Docker image count
-  shell: "docker images -aq | wc -l"
-  register: docker_image_count
-  when:
-  - l_docker_upgrade is defined
-  - l_docker_upgrade | bool
-
-- debug: var=docker_image_count.stdout
-  when:
-  - l_docker_upgrade is defined
-  - l_docker_upgrade | bool
-
-- import_tasks: upgrade/containerized_upgrade_pull.yml
-  when: openshift_is_containerized | bool
+  when: not openshift_is_atomic | bool
 
 # Prepull the rpms for docker upgrade, but don't install
 - name: download docker upgrade rpm
@@ -37,7 +25,21 @@
   - l_docker_upgrade is defined
   - l_docker_upgrade | bool
 
-- import_tasks: upgrade/rpm_upgrade.yml
+- name: Stage cri-o updates
+  command: "{{ ansible_pkg_mgr }} install -y --downloadonly {{ crio_pkgs | join(' ') }}"
+  register: result
+  until: result is succeeded
+  when:
+  - openshift_use_crio | bool
   vars:
-    openshift_version: "{{ openshift_pkg_version | default('') }}"
-  when: not openshift_is_containerized | bool
+    crio_pkgs:
+    - "cri-o"
+    - "cri-tools"
+
+- import_tasks: upgrade/rpm_upgrade.yml
+  when: not openshift_is_atomic | bool
+
+- import_tasks: prepull_check.yml
+
+- import_tasks: copy_image_to_ostree.yml
+  when: openshift_is_atomic | bool

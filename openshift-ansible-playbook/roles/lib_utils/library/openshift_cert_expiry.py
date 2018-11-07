@@ -10,6 +10,7 @@ import io
 import os
 import subprocess
 import yaml
+import dateutil.parser
 
 # pylint import-error disabled because pylint cannot find the package
 # when installed in a virtualenv
@@ -145,7 +146,7 @@ platforms missing the Python OpenSSL library.
                 # => 20190207181935Z
                 not_after_raw = l.partition(' : ')[-1]
                 # Last item: ('Not After', ' : ', 'Feb  7 18:19:35 2019 GMT')
-                not_after_parsed = datetime.datetime.strptime(not_after_raw, '%b %d %H:%M:%S %Y %Z')
+                not_after_parsed = dateutil.parser.parse(not_after_raw)
                 self.not_after = not_after_parsed.strftime('%Y%m%d%H%M%SZ')
 
             elif l.startswith('X509v3 Subject Alternative Name:'):
@@ -433,9 +434,12 @@ an OpenShift Container Platform cluster
                                                 "master", "master-config.yaml")
     openshift_node_config_path = os.path.join(openshift_base_config_path,
                                               "node", "node-config.yaml")
+    openshift_node_bootstrap_config_path = os.path.join(openshift_base_config_path,
+                                                        "node", "bootstrap-node-config.yaml")
     openshift_cert_check_paths = [
         openshift_master_config_path,
         openshift_node_config_path,
+        openshift_node_bootstrap_config_path,
     ]
 
     # Paths for Kubeconfigs. Additional kubeconfigs are conditionally
@@ -504,13 +508,34 @@ an OpenShift Container Platform cluster
             # = 'foo.crt' implies that 'foo.crt' is in the same
             # directory. certFile = '../foo.crt' is in the parent directory.
             cfg_path = os.path.dirname(fp.name)
-            cert_meta['certFile'] = os.path.join(cfg_path, cfg['servingInfo']['certFile'])
-            cert_meta['clientCA'] = os.path.join(cfg_path, cfg['servingInfo']['clientCA'])
-            cert_meta['serviceSigner'] = os.path.join(cfg_path, cfg['controllerConfig']['serviceServingCert']['signer']['certFile'])
-            cert_meta['etcdClientCA'] = os.path.join(cfg_path, cfg['etcdClientInfo']['ca'])
-            cert_meta['etcdClientCert'] = os.path.join(cfg_path, cfg['etcdClientInfo']['certFile'])
-            cert_meta['kubeletCert'] = os.path.join(cfg_path, cfg['kubeletClientInfo']['certFile'])
-            cert_meta['proxyClient'] = os.path.join(cfg_path, cfg['kubernetesMasterConfig']['proxyClientInfo']['certFile'])
+
+            servingInfoFile = cfg.get('servingInfo', {}).get('certFile')
+            if servingInfoFile:
+                cert_meta['certFile'] = os.path.join(cfg_path, servingInfoFile)
+
+            servingInfoCA = cfg.get('servingInfo', {}).get('clientCA')
+            if servingInfoCA:
+                cert_meta['clientCA'] = os.path.join(cfg_path, servingInfoCA)
+
+            serviceSigner = cfg.get('controllerConfig', {}).get('serviceServingCert', {}).get('signer', {}).get('certFile')
+            if serviceSigner:
+                cert_meta['serviceSigner'] = os.path.join(cfg_path, serviceSigner)
+
+            etcdClientCA = cfg.get('etcdClientInfo', {}).get('ca')
+            if etcdClientCA:
+                cert_meta['etcdClientCA'] = os.path.join(cfg_path, etcdClientCA)
+
+            etcdClientCert = cfg.get('etcdClientInfo', {}).get('certFile')
+            if etcdClientCert:
+                cert_meta['etcdClientCert'] = os.path.join(cfg_path, etcdClientCert)
+
+            kubeletCert = cfg.get('kubeletClientInfo', {}).get('certFile')
+            if kubeletCert:
+                cert_meta['kubeletCert'] = os.path.join(cfg_path, kubeletCert)
+
+            proxyClient = cfg.get('kubernetesMasterConfig', {}).get('proxyClientInfo', {}).get('certFile')
+            if proxyClient:
+                cert_meta['proxyClient'] = os.path.join(cfg_path, proxyClient)
 
         ######################################################################
         # Load the certificate and the CA, parse their expiration dates into
@@ -546,45 +571,49 @@ an OpenShift Container Platform cluster
     # There may be additional kubeconfigs to check, but their naming
     # is less predictable than the ones we've already assembled.
 
-    try:
-        # Try to read the standard 'node-config.yaml' file to check if
-        # this host is a node.
-        with io.open(openshift_node_config_path, 'r', encoding='utf-8') as fp:
-            cfg = yaml.load(fp)
+    for node_config in [openshift_node_config_path, openshift_node_bootstrap_config_path]:
+        try:
+            # Try to read the standard 'node-config.yaml' file to check if
+            # this host is a node.
+            with io.open(node_config, 'r', encoding='utf-8') as fp:
+                cfg = yaml.load(fp)
 
-        # OK, the config file exists, therefore this is a
-        # node. Nodes have their own kubeconfig files to
-        # communicate with the master API. Let's read the relative
-        # path to that file from the node config.
-        node_masterKubeConfig = cfg['masterKubeConfig']
-        # As before, the path to the 'masterKubeConfig' file is
-        # relative to `fp`
-        cfg_path = os.path.dirname(fp.name)
-        node_kubeconfig = os.path.join(cfg_path, node_masterKubeConfig)
+            # OK, the config file exists, therefore this is a
+            # node. Nodes have their own kubeconfig files to
+            # communicate with the master API. Let's read the relative
+            # path to that file from the node config.
+            node_masterKubeConfig = cfg['masterKubeConfig']
+            # As before, the path to the 'masterKubeConfig' file is
+            # relative to `fp`
+            cfg_path = os.path.dirname(fp.name)
+            node_kubeconfig = os.path.join(cfg_path, node_masterKubeConfig)
 
-        with io.open(node_kubeconfig, 'r', encoding='utf8') as fp:
-            # Read in the nodes kubeconfig file and grab the good stuff
-            cfg = yaml.load(fp)
+            with io.open(node_kubeconfig, 'r', encoding='utf8') as fp:
+                # Read in the nodes kubeconfig file and grab the good stuff
+                cfg = yaml.load(fp)
 
-        c = cfg['users'][0]['user']['client-certificate-data']
-        (cert_subject,
-         cert_expiry_date,
-         time_remaining,
-         cert_serial) = load_and_handle_cert(c, now, base64decode=True, ans_module=module)
+            c = cfg['users'][0]['user'].get('client-certificate-data')
+            if not c:
+                # This is not a node
+                raise IOError
+            (cert_subject,
+             cert_expiry_date,
+             time_remaining,
+             cert_serial) = load_and_handle_cert(c, now, base64decode=True, ans_module=module)
 
-        expire_check_result = {
-            'cert_cn': cert_subject,
-            'path': fp.name,
-            'expiry': cert_expiry_date,
-            'days_remaining': time_remaining.days,
-            'health': None,
-            'serial': cert_serial
-        }
+            expire_check_result = {
+                'cert_cn': cert_subject,
+                'path': fp.name,
+                'expiry': cert_expiry_date,
+                'days_remaining': time_remaining.days,
+                'health': None,
+                'serial': cert_serial
+            }
 
-        classify_cert(expire_check_result, now, time_remaining, expire_window, kubeconfigs)
-    except IOError:
-        # This is not a node
-        pass
+            classify_cert(expire_check_result, now, time_remaining, expire_window, kubeconfigs)
+        except IOError:
+            # This is not a node
+            pass
 
     for kube in filter_paths(kubeconfig_paths):
         with io.open(kube, 'r', encoding='utf-8') as fp:
@@ -751,7 +780,7 @@ an OpenShift Container Platform cluster
     ######################################################################
 
     res = tabulate_summary(ocp_certs, kubeconfigs, etcd_certs, router_certs, registry_certs)
-
+    warn_certs = bool(res['expired'] + res['warning'])
     msg = "Checked {count} total certificates. Expired/Warning/OK: {exp}/{warn}/{ok}. Warning window: {window} days".format(
         count=res['total'],
         exp=res['expired'],
@@ -794,6 +823,7 @@ an OpenShift Container Platform cluster
     # error we noticed earlier
     module.exit_json(
         check_results=check_results,
+        warn_certs=warn_certs,
         summary=res,
         msg=msg,
         rc=0,

@@ -12,7 +12,7 @@ metadata:
     openshift.io/provider-display-name: Red Hat, Inc.
 parameters:
 - name: IMAGE
-  value: openshift/origin-web-console:latest
+  value: docker.io/openshift/origin-web-console:latest
 - name: NAMESPACE
   # This namespace cannot be changed. Only `openshift-web-console` is supported.
   value: openshift-web-console
@@ -37,7 +37,10 @@ objects:
   spec:
     replicas: "${{REPLICA_COUNT}}"
     strategy:
-      type: Recreate
+      type: RollingUpdate
+      rollingUpdate:
+        # behave like a recreate deployment, but don't wait for pods to terminate
+        maxUnavailable: 100%
     template:
       metadata:
         name: webconsole
@@ -87,11 +90,11 @@ objects:
         volumes:
         - name: serving-cert
           secret:
-            defaultMode: 400
+            defaultMode: 0440
             secretName: webconsole-serving-cert
         - name: webconsole-config
           configMap:
-            defaultMode: 440
+            defaultMode: 0440
             name: webconsole-config
 
 # to create the config for the web console

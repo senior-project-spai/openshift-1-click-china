@@ -9,6 +9,9 @@
     - httpd-tools
     - python-passlib
 
+- name: Set tmp/htpasswd
+  shell: "htpasswd -bc /tmp/htpasswd admin admin"
+
 - name: Set playbook Repo disalbed
   shell: "sed -i 's/enabled=1/enabled=0/g' ./openshift-ansible-playbook/roles/openshift_repos/templates/CentOS-OpenShift-Origin.repo.j2"
   when: true == {{CHANGEREPO}}

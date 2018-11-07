@@ -38,7 +38,8 @@ LOGGING_INFRA_KEY = "logging-infra"
 DS_FLUENTD_SELECTOR = LOGGING_INFRA_KEY + "=" + "fluentd"
 LOGGING_SELECTOR = LOGGING_INFRA_KEY + "=" + "support"
 ROUTE_SELECTOR = "component=support,logging-infra=support,provider=openshift"
-COMPONENTS = ["kibana", "curator", "elasticsearch", "fluentd", "kibana_ops", "curator_ops", "elasticsearch_ops"]
+# pylint: disable=line-too-long
+COMPONENTS = ["kibana", "curator", "elasticsearch", "fluentd", "kibana_ops", "curator_ops", "elasticsearch_ops", "mux", "eventrouter"]
 
 
 class OCBaseCommand(object):
@@ -75,6 +76,7 @@ class OCBaseCommand(object):
         try:
             process = Popen(cmd, stdout=PIPE, stderr=PIPE)   # noqa: F405
             out, err = process.communicate(cmd)
+            err = err.decode(encoding='utf8', errors='replace')
             if len(err) > 0:
                 if 'not found' in err:
                     return {'items': []}
@@ -136,15 +138,15 @@ class OpenshiftLoggingFacts(OCBaseCommand):
             name = ds_item["metadata"]["name"]
             comp = self.comp(name)
             spec = ds_item["spec"]["template"]["spec"]
-            container = spec["containers"][0]
             result = dict(
                 selector=ds_item["spec"]["selector"],
-                image=container["image"],
-                resources=container["resources"],
+                containers=dict(),
                 nodeSelector=spec["nodeSelector"],
                 serviceAccount=spec["serviceAccount"],
                 terminationGracePeriodSeconds=spec["terminationGracePeriodSeconds"]
             )
+            for container in spec["containers"]:
+                result["containers"][container["name"]] = container
             self.add_facts_for(comp, "daemonsets", name, result)
 
     def facts_for_pvcs(self, namespace):
@@ -309,6 +311,10 @@ class OpenshiftLoggingFacts(OCBaseCommand):
             return "elasticsearch"
         elif name.startswith("logging-fluentd") or name.endswith("aggregated-logging-fluentd"):
             return "fluentd"
+        elif name.startswith("logging-mux"):
+            return "mux"
+        elif name.startswith("logging-eventrouter"):
+            return "eventrouter"
         else:
             return None
 

@@ -3,14 +3,17 @@
   import_tasks: firewall.yml
 
 - name: Install cockpit-ws
-  package: name={{ item }} state=present
-  with_items:
+  package:
+    name: "{{ pkg_list | join(',') }}"
+    state: present
+  vars:
+    pkg_list:
     - cockpit-ws
     - cockpit-system
     - cockpit-bridge
     - cockpit-docker
-    - "{{ cockpit_plugins }}"
-  when: not openshift_is_containerized | bool
+    - "{{ cockpit_plugins | join(',') }}"
+  when: not openshift_is_atomic | bool
   register: result
   until: result is succeeded
 
@@ -19,4 +22,4 @@
     name: cockpit.socket
     enabled: true
     state: started
-  when: not openshift_is_containerized | bool
+  when: not openshift_is_atomic | bool

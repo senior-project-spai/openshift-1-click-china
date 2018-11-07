@@ -5,22 +5,39 @@
   hosts: "{{ l_init_fact_hosts | default('oo_all_hosts') }}"
   roles:
   - role: openshift_facts
+  - role: lib_utils
   tasks:
+  - name: get openshift_current_version
+    # get_current_openshift_version is a custom module in lib_utils
+    # this will set_fact openshift_current_version
+    get_current_openshift_version:
+      deployment_type: "{{ openshift_deployment_type }}"
+
+  # oo_first_master group might not be present due to provisioning plays
+  # for existing clusters, openshift_portal_net will be force-set by
+  # basic_facts.yml from value in existing master configs.
+  - name: set_fact openshift_portal_net if present on masters
+    set_fact:
+      openshift_portal_net: "{{ hostvars[groups.oo_first_master.0].openshift_portal_net }}"
+    when:
+    - "'oo_first_master' in groups"
+    - "groups.oo_first_master | length > 0"
+    - "'openshift_portal_net' in hostvars[groups.oo_first_master.0]"
+
   - name: Gather Cluster facts
     openshift_facts:
       role: common
       local_facts:
-        deployment_type: "{{ openshift_deployment_type }}"
-        deployment_subtype: "{{ openshift_deployment_subtype | default(None) }}"
-        hostname: "{{ openshift_hostname | default(None) }}"
+        hostname: "{{ openshift_kubelet_name_override | default(None) }}"
         ip: "{{ openshift_ip | default(None) }}"
         public_hostname: "{{ openshift_public_hostname | default(None) }}"
         public_ip: "{{ openshift_public_ip | default(None) }}"
-        portal_net: "{{ openshift_portal_net | default(openshift_master_portal_net) | default(None) }}"
+        portal_net: "{{ openshift_portal_net }}"
         http_proxy: "{{ openshift_http_proxy | default(None) }}"
         https_proxy: "{{ openshift_https_proxy | default(None) }}"
         no_proxy: "{{ openshift_no_proxy | default(None) }}"
         generate_no_proxy_hosts: "{{ openshift_generate_no_proxy_hosts | default(True) }}"
+        cloudprovider: "{{ openshift_cloudprovider_kind | default(None) }}"
 
   - name: Set fact of no_proxy_internal_hostnames
     openshift_facts:
@@ -31,6 +48,11 @@
                                              | union(groups['oo_etcd_to_config'] | default([])))
                                          | lib_utils_oo_collect('openshift.common.hostname') | default([]) | join (',')
                                          }}"
+        no_proxy_master_ips: "{{ hostvars | lib_utils_oo_select_keys(groups['oo_masters_to_config']
+                                          | default([]))
+                                          | lib_utils_oo_collect('openshift.common.ip')
+                                          | default([]) | join (',')
+                              }}"
     when:
     - openshift_http_proxy is defined or openshift_https_proxy is defined
     - openshift_generate_no_proxy_hosts | default(True) | bool
@@ -40,6 +62,9 @@
       role: node
       local_facts:
         sdn_mtu: "{{ openshift_node_sdn_mtu | default(None) }}"
+  - name: set_fact l_kubelet_node_name
+    set_fact:
+      l_kubelet_node_name: "{{ openshift_kubelet_name_override | default(openshift.node.nodename) }}"
 
 - name: Initialize etcd host variables
   hosts: oo_masters_to_config
