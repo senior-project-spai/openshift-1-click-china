@@ -1,5 +1,6 @@
 #!/bin/bash
- 
+
+setenforce 1
 selinux=$(getenforce)
 if [ "$selinux" != Enforcing ]
 then
