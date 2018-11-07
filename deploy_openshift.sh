@@ -1,13 +1,5 @@
 #!/bin/bash
 
-setenforce 1
-selinux=$(getenforce)
-if [ "$selinux" != Enforcing ]
-then
-	echo "Please setlinux Enforcing"
-	exit 10
-fi
-
 export CHANGEREPO=true
 if [ $CHANGEREPO == true -a ! -d /etc/yum.repos.d/back ]
 then
