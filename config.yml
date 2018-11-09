@@ -6,3 +6,4 @@ Change_Base_Registry: false
 Harbor_Url: harbor.apps.it.example.com
 
 FULL_INSTALL: false
+SAMPLE_TEMPLATES: true
