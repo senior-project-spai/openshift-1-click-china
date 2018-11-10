@@ -1,0 +1,14 @@
+---
+- name: Ensure export directories exist
+  file:
+    path: "/exports/pv{{ item }}"
+    state: directory
+    mode: 0777
+    owner: nfsnobody
+    group: nfsnobody
+  loop: "{{ range(0, 100)|list }}"
+  
+- name: set exports
+  template: src='./templates/nfs_exports.j2' dest='/etc/exports.d/openshift-pvs.exports'
+  notify:
+    - restart nfs-server

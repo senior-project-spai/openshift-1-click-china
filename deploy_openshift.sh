@@ -19,9 +19,9 @@ fi
 
 current_path=`pwd`
 yum localinstall tools/ansible-2.6.5-1.el7.ans.noarch.rpm -y
-ansible-playbook playbook.yml
+ansible-playbook playbook.yml --skip-tags after_task
 cd $current_path/openshift-ansible-playbook
 ansible-playbook playbooks/prerequisites.yml
 ansible-playbook playbooks/deploy_cluster.yml
 oc adm policy add-cluster-role-to-user cluster-admin admin
-
+ansible-playbook playbook.yml --tags after_task

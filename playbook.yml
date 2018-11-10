@@ -8,12 +8,12 @@
   connection: local
   tasks:
 
-#    - include: tasks/update_repo.yml
-#      when: true == {{CHANGEREPO}}
-
     - include: tasks/common_set.yml
 
     - include: tasks/install.yml
+
+    - include: tasks/create_nfs.yml
+      tags: after_task
 
   handlers:
     - include: handlers/main.yml
