@@ -24,4 +24,6 @@ cd $current_path/openshift-ansible-playbook
 ansible-playbook playbooks/prerequisites.yml
 ansible-playbook playbooks/deploy_cluster.yml
 oc adm policy add-cluster-role-to-user cluster-admin admin
+
+cd $current_path
 ansible-playbook playbook.yml --tags after_task
