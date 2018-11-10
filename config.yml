@@ -8,4 +8,4 @@ Harbor_Url: harbor.apps.it.example.com
 FULL_INSTALL: false
 SAMPLE_TEMPLATES: true
 
-PV_COUNT: 10
+PV_COUNT: 20
