@@ -31,3 +31,6 @@
   file:
     path: "./pvs"
     state: absent
+
+- name: create gogs template
+  shell: oc create -f ./files/gogs-template.yml -n openshift
