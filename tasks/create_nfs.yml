@@ -33,4 +33,4 @@
     state: absent
 
 - name: create gogs template
-  shell: oc create -f ./files/gogs-template.yml -n openshift
+  shell: oc get template gogs -n openshift; if [ $? -gt 0 ]; then oc create -f ./files/gogs-template.yml -n openshift; fi
