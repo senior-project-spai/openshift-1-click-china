@@ -38,5 +38,5 @@
 #### 5. 本地绑定hosts
     <ip> os39.test.it.example.com
 #### 6. 浏览器访问
-    https://os39.test.it.example.com:8443
+    https://os311.test.it.example.com:8443
 
