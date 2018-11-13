@@ -96,48 +96,6 @@
     ],
     "objects": [
         {
-            "kind": "ImageStream",
-            "apiVersion": "v1",
-            "metadata": {
-                "name": "${APPLICATION_NAME}",
-                "labels": {
-                    "app": "${APPLICATION_NAME}"
-                }
-            },
-            "spec": {
-                "tags": [
-                    {
-                        "name": "gitlab-11.4.0",
-                        "from": {
-                            "kind": "DockerImage",
-                            "name": "gitlab/gitlab-ce:11.4.0-ce.0"
-                        }
-                    }
-                ]
-            }
-        },
-        {
-            "kind": "ImageStream",
-            "apiVersion": "v1",
-            "metadata": {
-                "name": "${APPLICATION_NAME}-redis",
-                "labels": {
-                    "app": "${APPLICATION_NAME}"
-                }
-            },
-            "spec": {
-                "tags": [
-                    {
-                        "name": "3.2.3",
-                        "from": {
-                            "kind": "DockerImage",
-                            "name": "redis:3.2.3-alpine"
-                        }
-                    }
-                ]
-            }
-        },
-        {
             "kind": "ServiceAccount",
             "apiVersion": "v1",
             "metadata": {
@@ -162,19 +120,6 @@
                 "triggers": [
                     {
                         "type": "ConfigChange"
-                    },
-                    {
-                        "type": "ImageChange",
-                        "imageChangeParams": {
-                            "automatic": true,
-                            "containerNames": [
-                                "gitlab-ce"
-                            ],
-                            "from": {
-                                "kind": "ImageStreamTag",
-                                "name": "${APPLICATION_NAME}:gitlab-11.4.0"
-                            }
-                        }
                     }
                 ],
                 "replicas": 1,
@@ -208,7 +153,7 @@
                         "containers": [
                             {
                                 "name": "gitlab-ce",
-                                "image": "gitlab-ce",
+                                "image": "gitlab/gitlab-ce:11.4.0-ce.0",
                                 "ports": [
                                     {
                                         "containerPort": 22,
@@ -299,19 +244,6 @@
                 "triggers": [
                     {
                         "type": "ConfigChange"
-                    },
-                    {
-                        "type": "ImageChange",
-                        "imageChangeParams": {
-                            "automatic": true,
-                            "containerNames": [
-                                "gitlab-ce-redis"
-                            ],
-                            "from": {
-                                "kind": "ImageStreamTag",
-                                "name": "${APPLICATION_NAME}-redis:3.2.3"
-                            }
-                        }
                     }
                 ],
                 "replicas": 1,
@@ -339,7 +271,7 @@
                         "containers": [
                             {
                                 "name": "gitlab-ce-redis",
-                                "image": "gitlab-ce-redis",
+                                "image": "redis:3.2.3-alpine",
                                 "command": [
                                     "/bin/sh",
                                     "-ec"
@@ -425,20 +357,6 @@
                 "triggers": [
                     {
                         "type": "ConfigChange"
-                    },
-                    {
-                        "type": "ImageChange",
-                        "imageChangeParams": {
-                            "automatic": true,
-                            "containerNames": [
-                                "gitlab-ce-postgresql"
-                            ],
-                            "from": {
-                                "kind": "ImageStreamTag",
-                                "name": "postgresql:9.4",
-                                "namespace": "openshift"
-                            }
-                        }
                     }
                 ],
                 "replicas": 1,
@@ -466,7 +384,7 @@
                         "containers": [
                             {
                                 "name": "gitlab-ce-postgresql",
-                                "image": "gitlab-ce-postgresql",
+                                "image": "docker.io/centos/postgresql-95-centos7:latest",
                                 "ports": [
                                     {
                                         "containerPort": 5432,

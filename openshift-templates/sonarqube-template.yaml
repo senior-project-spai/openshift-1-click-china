@@ -37,22 +37,6 @@ objects:
       kind: Service
       name: sonarqube
 - apiVersion: v1
-  kind: ImageStream
-  metadata:
-    labels:
-      app: sonarqube
-    name: sonarqube
-  spec:
-    tags:
-    - annotations:
-        description: The SonarQube Docker image
-        tags: sonarqube
-      from:
-        kind: DockerImage
-        name: openshiftdemos/sonarqube:${SONARQUBE_VERSION}
-      importPolicy: {}
-      name: ${SONARQUBE_VERSION}
-- apiVersion: v1
   kind: DeploymentConfig
   metadata:
     labels:
@@ -90,7 +74,7 @@ objects:
             value: jdbc:postgresql://postgresql-sonarqube/sonar
           - name: SONARQUBE_JDBC_USERNAME
             value: sonar
-          image: ' '
+          image: openshiftdemos/sonarqube:${SONARQUBE_VERSION}
           imagePullPolicy: IfNotPresent
           name: sonarqube
           ports:
@@ -135,14 +119,6 @@ objects:
             claimName: sonarqube-data
     triggers:
     - type: ConfigChange
-    - imageChangeParams:
-        automatic: true
-        containerNames:
-        - sonarqube
-        from:
-          kind: ImageStreamTag
-          name: sonarqube:${SONARQUBE_VERSION}
-      type: ImageChange
 - apiVersion: v1
   kind: Service
   metadata:
@@ -191,7 +167,7 @@ objects:
             value: ${POSTGRESQL_PASSWORD}
           - name: POSTGRESQL_DATABASE
             value: sonar
-          image: ' '
+          image: docker.io/centos/postgresql-95-centos7:latest
           imagePullPolicy: IfNotPresent
           livenessProbe:
             failureThreshold: 3
@@ -237,14 +213,6 @@ objects:
             claimName: postgresql-sonarqube-data
     test: false
     triggers:
-    - imageChangeParams:
-        automatic: true
-        containerNames:
-        - postgresql
-        from:
-          kind: ImageStreamTag
-          name: postgresql:9.5
-      type: ImageChange
     - type: ConfigChange
 - apiVersion: v1
   kind: PersistentVolumeClaim
