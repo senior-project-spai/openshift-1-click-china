@@ -1,4 +1,6 @@
 #!/bin/bash
+OPENSHIFT_TEMPLATE_DIR='./openshift-templates'
+CICD_TEMPLATES = ( gogs jenkins )
 
 # create project CI
 oc get project cicd; if [ $? -gt 0 ]; then oc new-project cicd --display-name="CICD自动化"; fi
@@ -7,5 +9,12 @@ oc get project cicd; if [ $? -gt 0 ]; then oc new-project cicd --display-name="C
 oc adm policy add-scc-to-user anyuid -z gitlab-ce-user -n cicd
 oc adm policy add-scc-to-user anyuid -z cicd -n cicd
 
-# 添加GOGS模板
-oc get template gogs -n cicd; if [ $? -gt 0 ]; then oc create -f ./files/gogs-template.yml -n cicd; fi
+for temp_name in "${CICD_TEMPLATES[@]}"
+do 
+	oc get template $temp_name -n cicd
+	if [ $? -gt 0 ]
+	then
+		oc create -f ${OPENSHIFT_TEMPLATE_DIR}/${temp_name}-template.yml -n cicd
+	fi
+done
+
