@@ -18,3 +18,9 @@ do
 	fi
 done
 
+#删除registry-console模板
+oc get template registry-console -n openshift
+if [ $? -eq 0 ]
+then
+	oc delete template registry-console -n openshift
+fi
