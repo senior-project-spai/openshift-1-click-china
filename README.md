@@ -36,7 +36,7 @@
     /bin/bash deploy_openshift.sh
     
 #### 5. 本地绑定hosts
-    <ip> os39.test.it.example.com
+    <ip> os311.test.it.example.com
 #### 6. 浏览器访问
     https://os311.test.it.example.com:8443
 
