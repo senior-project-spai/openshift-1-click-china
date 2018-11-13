@@ -4,6 +4,7 @@ metadata:
   annotations:
     description: The Gogs git server (https://gogs.io/)
     tags: instant-app,gogs,jenkins
+    iconClass: icon-gogs
   name: gogs
 objects:
 - kind: ServiceAccount

@@ -1,0 +1,19 @@
+.icon-gogs{
+  background-image: url(https://xhua-static.sh1a.qingstor.com/allinone/gogs.png);
+  width: 50px;
+  height: 50px;
+  background-size: 100% 100%;
+}
+.icon-sonarqube{
+  background-image: url(https://xhua-static.sh1a.qingstor.com/allinone/sonarqube.svg);
+  width: 80px;
+  height: 50px;
+  background-size: 100% 100%;
+}
+
+.icon-nexus3{
+  background-image: url(https://xhua-static.sh1a.qingstor.com/allinone/nexus3.png);
+  width: 80px;
+  height: 80px;
+  background-size: 100% 100%;
+}
