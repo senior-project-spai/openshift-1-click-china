@@ -20,12 +20,7 @@ metadata:
     openshift.io/provider-display-name: Red Hat, Inc.
     openshift.io/support-url: https://access.redhat.com
     tags: instant-app,jenkins
-  creationTimestamp: 2018-10-29T09:47:50Z
   name: jenkins
-  namespace: openshift
-  resourceVersion: "8633"
-  selfLink: /apis/template.openshift.io/v1/namespaces/openshift/templates/jenkins
-  uid: b2f69cb5-db5f-11e8-b960-5254c6d5ae31
 objects:
 - apiVersion: v1
   kind: Route
