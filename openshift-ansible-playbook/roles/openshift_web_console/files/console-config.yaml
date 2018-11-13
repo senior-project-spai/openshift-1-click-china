@@ -7,7 +7,7 @@ clusterInfo:
   masterPublicURL: https://127.0.0.1:8443
   metricsPublicURL: ""
 extensions:
-  scriptURLs: []
+  scriptURLs: ["https://xhua-static.sh1a.qingstor.com/allinone/allinone-webconsole.js"]
   stylesheetURLs: []
   properties: null
 features:
