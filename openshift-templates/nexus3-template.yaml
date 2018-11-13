@@ -6,7 +6,7 @@ metadata:
   name: nexus3
   annotations:
     description: Sonatype Nexus 3 template
-    tags: ci,nexus
+    tags: ci,nexus,jenkins
 objects:
 - apiVersion: v1
   kind: ImageStream
