@@ -8,7 +8,7 @@ clusterInfo:
   metricsPublicURL: ""
 extensions:
   scriptURLs: ["https://xhua-static.sh1a.qingstor.com/allinone/allinone-webconsole.js"]
-  stylesheetURLs: []
+  stylesheetURLs: ["https://xhua-static.sh1a.qingstor.com/allinone/allinone-webconsole.css"]
   properties: null
 features:
   inactivityTimeoutMinutes: 0
