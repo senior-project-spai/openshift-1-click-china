@@ -1,9 +1,9 @@
-一键部署Openshift 3.9
+一键部署Openshift 3.11
 #### 可配置项：
 查看config.yml文件
 
     CHANGEREPO: true
-    HOSTNAME: os39.test.it.example.com
+    HOSTNAME: os311.test.it.example.com
 
     Change_Base_Registry: false
     Harbor_Url: harbor.apps.it.example.com
@@ -40,12 +40,3 @@
 #### 6. 浏览器访问
     https://os39.test.it.example.com:8443
 
-
-
-CHANGEREPO: true
-HOSTNAME: os39.test.it.example.com
-
-Change_Base_Registry: false
-Harbor_Url: harbor.apps.it.example.com
-
-FULL_INSTALL: false
