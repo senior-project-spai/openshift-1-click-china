@@ -23,6 +23,7 @@
             "description": "Hostname for service routes. Set this in order to have the GitLab display the correct clone urls.",
             "displayName": "Gitlab instance hostname",
             "name": "APPLICATION_HOSTNAME",
+            "value": "gitlab.apps.os311.test.it.example.com",
             "required": true
         },
         {
