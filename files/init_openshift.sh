@@ -6,7 +6,7 @@ CICD_TEMPLATES=(gogs jenkins gitlab nexus3 sonarqube)
 oc get project cicd; if [ $? -gt 0 ]; then oc new-project cicd --display-name="CICD自动化"; fi
 
 # 设置权限
-# oc create serviceaccount cicd
+oc create serviceaccount cicd -n cicd
 oc adm policy add-scc-to-user anyuid -z cicd -n cicd
 
 for temp_name in "${CICD_TEMPLATES[@]}"

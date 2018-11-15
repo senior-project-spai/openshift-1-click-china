@@ -96,13 +96,6 @@
     ],
     "objects": [
         {
-            "kind": "ServiceAccount",
-            "apiVersion": "v1",
-            "metadata": {
-                "name": "cicd"
-            }
-        },
-        {
             "kind": "DeploymentConfig",
             "apiVersion": "v1",
             "metadata": {
