@@ -22,8 +22,15 @@ yum localinstall tools/ansible-2.6.5-1.el7.ans.noarch.rpm -y
 ansible-playbook playbook.yml --skip-tags after_task
 cd $current_path/openshift-ansible-playbook
 ansible-playbook playbooks/prerequisites.yml
+
+## 运行下载镜像
+nohup bash ${current_path}/files/pull_cicd_images.sh &
+
 ansible-playbook playbooks/deploy_cluster.yml
 oc adm policy add-cluster-role-to-user cluster-admin admin
 
 cd $current_path
 ansible-playbook playbook.yml --tags after_task
+
+
+
