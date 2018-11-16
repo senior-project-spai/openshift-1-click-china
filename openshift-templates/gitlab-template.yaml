@@ -29,6 +29,7 @@
         {
             "name": "GITLAB_ROOT_PASSWORD",
             "displayName": "GitLab Root User Password",
+            "value": "12345678",
             "description": "Password for the GitLab 'root' user. Must be at least 8 characters long. Leave blank if you would rather configure the password using the website during first use."
         },
         {
