@@ -23,7 +23,7 @@
             "description": "Hostname for service routes. Set this in order to have the GitLab display the correct clone urls.",
             "displayName": "Gitlab instance hostname",
             "name": "APPLICATION_HOSTNAME",
-            "value": "gitlab.apps.os311.test.it.example.com",
+            "value": "gitlab-cicd.apps.os311.test.it.example.com",
             "required": true
         },
         {
@@ -165,11 +165,9 @@
                                 ],
                                 "resources": {
                                     "limits": {
-                                        "cpu": "1",
                                         "memory": "2Gi"
                                     },
                                     "requests": {
-                                        "cpu": "500m",
                                         "memory": "1Gi"
                                     }
                                 },

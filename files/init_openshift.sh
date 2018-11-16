@@ -3,7 +3,7 @@ OPENSHIFT_TEMPLATE_DIR='./openshift-templates'
 CICD_TEMPLATES=(gogs jenkins gitlab nexus3 sonarqube)
 
 # create project CI
-oc get project cicd; if [ $? -gt 0 ]; then oc new-project cicd --display-name="CICD自动化"; fi
+oc get project cicd; if [ $? -gt 0 ]; then oc new-project cicd --display-name="CICD持续集成"; fi
 
 # 设置权限
 oc create serviceaccount cicd -n cicd
