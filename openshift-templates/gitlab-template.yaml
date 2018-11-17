@@ -376,7 +376,7 @@
                         "containers": [
                             {
                                 "name": "gitlab-ce-postgresql",
-                                "image": "docker.io/centos/postgresql-95-centos7:latest",
+                                "image": "centos/postgresql-95-centos7:latest",
                                 "ports": [
                                     {
                                         "containerPort": 5432,

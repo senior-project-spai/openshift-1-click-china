@@ -1,6 +1,7 @@
 #!/bin/bash
 OPENSHIFT_TEMPLATE_DIR='./openshift-templates'
 CICD_TEMPLATES=(gogs jenkins gitlab nexus3 sonarqube)
+OPENSHIFT_TEMPLATES=(redis postgresql)
 
 # create project CI
 oc get project cicd; if [ $? -gt 0 ]; then oc new-project cicd --display-name="CICD持续集成"; fi
@@ -15,6 +16,16 @@ do
 	if [ $? -gt 0 ]
 	then
 		oc create -f ${OPENSHIFT_TEMPLATE_DIR}/${temp_name}-template.yaml -n cicd
+	fi
+done
+
+
+for temp_name in "${OPENSHIFT_TEMPLATES[@]}"
+do 
+	oc get template $temp_name -n openshift
+	if [ $? -gt 0 ]
+	then
+		oc create -f ${OPENSHIFT_TEMPLATE_DIR}/${temp_name}-template.yaml -n openshift
 	fi
 done
 
