@@ -1,7 +1,7 @@
 #!/bin/bash
 OPENSHIFT_TEMPLATE_DIR='./openshift-templates'
-CICD_TEMPLATES=(gogs jenkins gitlab nexus3 sonarqube)
-OPENSHIFT_TEMPLATES=(redis postgresql mysql)
+CICD_TEMPLATES=(gogs gitlab nexus3 sonarqube)
+OPENSHIFT_TEMPLATES=(redis postgresql mysql jenkins)
 
 # create project CI
 oc get project cicd; if [ $? -gt 0 ]; then oc new-project cicd --display-name="CICD持续集成"; fi

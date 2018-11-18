@@ -20,7 +20,7 @@ metadata:
     openshift.io/provider-display-name: Red Hat, Inc.
     openshift.io/support-url: https://access.redhat.com
     tags: instant-app,jenkins
-  name: jenkins
+  name: jenkins-ephemeral
 objects:
 - apiVersion: v1
   kind: Route
