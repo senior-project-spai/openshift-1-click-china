@@ -7,13 +7,6 @@ metadata:
     iconClass: icon-gogs
   name: gogs
 objects:
-- kind: ServiceAccount
-  apiVersion: v1
-  metadata:
-    creationTimestamp: null
-    labels:
-      app: ${APPLICATION_NAME}
-    name: ${APPLICATION_NAME}
 - kind: Service
   apiVersion: v1
   metadata:
@@ -49,7 +42,6 @@ objects:
           name: ${APPLICATION_NAME}-postgresql
         name: ${APPLICATION_NAME}-postgresql
       spec:
-        serviceAccountName: ${APPLICATION_NAME}
         containers:
         - env:
           - name: POSTGRESQL_USER
@@ -159,7 +151,6 @@ objects:
           app: ${APPLICATION_NAME}
           deploymentconfig: ${APPLICATION_NAME}
       spec:
-        serviceAccountName: ${APPLICATION_NAME}
         containers:
         - image: docker.io/openshiftdemos/gogs:${GOGS_VERSION}
           imagePullPolicy: Always
