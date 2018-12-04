@@ -11,6 +11,8 @@
     FULL_INSTALL: false
     SAMPLE_TEMPLATES: true
 
+    CICD_INSTALL: false
+
     PV_COUNT: 20
 说明:
 - CHANGEREPO: 是否使用files/all.repo替换系统默认repo源
@@ -19,6 +21,7 @@
 - Harbor_Url：私有镜像仓库地址，Change_Base_Registry为True时有效
 - FULL_INSTALL：是否全量安装（包括日志，监控等）
 - SAMPLE_TEMPLATES: 是否安装Openshift默认的模板
+- CICD_INSTALL: 是否安装CICD应用工具链
 - PV_COUNT: 自动创建NFS目录及创建PV的数量
 
 安装步骤如下：
