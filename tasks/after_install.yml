@@ -34,3 +34,7 @@
 
 - name: init openshift cicd
   script: ./files/init_openshift.sh
+
+- name: cicd install
+  script: ./files/init_cicd.sh
+  when: true == {{CICD_INSTALL}}

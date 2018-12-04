@@ -12,7 +12,7 @@
 
     - include: tasks/install.yml
 
-    - include: tasks/create_nfs.yml
+    - include: tasks/after_install.yml
       tags: after_task
 
   handlers:
