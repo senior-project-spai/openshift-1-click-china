@@ -20,10 +20,12 @@ else
 	git clone https://gitee.com/openshiftx/jeesite.git
 	cd jeesite
 fi
-oc get bc jeesite  -n jeesite > /dev/null 2>&1 || cat Dockerfile | oc new-build -D - --name jeesite -n jeesite
+oc get bc jeesite  -n jeesite > /dev/null 2>&1 || cat Dockerfile | oc new-build -D - --name jeesite -n jeesite && oc adm policy add-scc-to-user anyuid -z jeesite -n jeesite
 oc get bc jeesite-pipeline  -n jeesite > /dev/null 2>&1 || oc create -f openshift-pipeline.yml -n jeesite
 
 oc get serviceaccount jeesite -n jeesite 2>&1 || oc create serviceaccount jeesite -n jeesite
 oc get dc jeesite > /dev/null 2>&1 || oc create -f ../openshift-templates/jeesite-deployment.yaml -n jeesite
 oc get svc jeesite > /dev/null 2>&1 || oc expose dc jeesite --port=8080
 oc get route jeesite > /dev/null 2>&1 || oc expose svc jeesite
+
+echo "success"
