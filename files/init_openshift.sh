@@ -1,14 +1,14 @@
 #!/bin/bash
 OPENSHIFT_TEMPLATE_DIR='./openshift-templates'
 CICD_TEMPLATES=(gogs gitlab nexus3 sonarqube)
-OPENSHIFT_TEMPLATES=(redis postgresql mysql jenkins)
+OPENSHIFT_TEMPLATES=(redis-persistent postgresql-persistent mysql-persistent jenkins-ephemeral)
 
 # create project CI
 oc get project cicd > /dev/null 2>&1  || oc new-project cicd --display-name="CICD持续集成"
 
 # 设置权限
-oc create serviceaccount cicd -n cicd
-oc adm policy add-scc-to-user anyuid -z cicd -n cicd
+oc get serviceaccount cicd -n cicd > /dev/null 2>&1 || oc create serviceaccount cicd -n cicd
+oc get serviceaccount cicd -n cicd > /dev/null 2>&1 || oc adm policy add-scc-to-user anyuid -z cicd -n cicd
 
 for temp_name in "${CICD_TEMPLATES[@]}"
 do 
@@ -23,3 +23,4 @@ done
 
 #删除registry-console模板
 oc get template registry-console -n openshift > /dev/null 2>&1 && oc delete template registry-console -n openshift
+echo "success"

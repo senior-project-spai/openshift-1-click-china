@@ -8,6 +8,7 @@
     - java-1.8.0-openjdk
     - httpd-tools
     - python-passlib
+    - mariadb
 
 - name: Set tmp/htpasswd
   shell: "htpasswd -bc /tmp/htpasswd admin admin"

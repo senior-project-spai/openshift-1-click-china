@@ -38,3 +38,29 @@
 - name: cicd install
   script: ./files/init_cicd.sh
   when: true == {{CICD_INSTALL}}
+  ignore_errors: true
+
+- name: check gogs hostname line
+  lineinfile: 
+    dest: /etc/hosts
+    line: "{{ansible_default_ipv4.address}}  {{ item }}.apps.{{ HOSTNAME }}"
+  with_items:
+    - gogs-cicd
+    - jenkins-cicd
+    - sonarqube-cicd
+    - nexus-cicd
+    - jenkins-jeesite
+    - jeesite-jeesite
+  notify:
+    - restart dnsmasq
+
+- name: waiting for mysql up
+  command: oc get dc mysql -n jeesite| grep -v NAME| awk '{print $4}'
+  register: mysql_result
+  until: "mysql_result.stdout == '1'"
+  reties: 60
+  delay: 10
+
+- name: init jeesite data
+  shell: table_count=$(mysql -hmysql.jeesite.svc -ujeesite -pjeesite jeesite -e "show tables;" | wc -l); if "$table_count" == "0"; mysql -hmysql.jeesite.svc -ujeesite -pjeesite jeesite < jeesite/db/jeesite_mysql.sql; fi
+
