@@ -6,7 +6,7 @@ function deploy_app_cicd(){
 
 }
 
-deploy_app_cicd gogs cicd
+deploy_app_cicd gogs  cicd
 deploy_app_cicd nexus3 cicd
 deploy_app_cicd sonarqube cicd
 
