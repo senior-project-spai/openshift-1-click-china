@@ -47,4 +47,4 @@
 ![自动创建Pipeline](https://images.gitee.com/uploads/images/2018/1211/180737_038ab5ba_550732.png "屏幕截图.png")
 
 ![测试pipeline应用](https://images.gitee.com/uploads/images/2018/1211/181107_da9cea98_550732.png "屏幕截图.png")
-用户名：thinkgem  密码：admin
+用户名：admin  密码：admin
