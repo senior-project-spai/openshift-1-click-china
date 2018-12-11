@@ -56,9 +56,9 @@
   when: CICD_INSTALL
 
 - name: waiting for mysql up
-  command: oc get dc mysql -n jeesite| grep -v NAME| awk '{print $4}'
+  shell: oc get dc mysql -n jeesite| grep -v NAME| awk '{print $4}'
   register: mysql_result
-  until: "mysql_result.stdout == '1'"
+  until: mysql_result.stdout.find("1") != -1
   retries: 60
   delay: 10
   when: CICD_INSTALL
