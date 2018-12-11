@@ -1,4 +1,7 @@
 ---
+- name: Replace resolv.conf
+  template: src='./templates/resolv.conf.j2' dest='/etc/resolv.conf'
+  
 - name: Ensure export directories exist
   file:
     path: "/exports/pv{{ item }}"
