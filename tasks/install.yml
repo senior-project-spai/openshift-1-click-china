@@ -15,14 +15,14 @@
 
 - name: Set playbook Repo disalbed
   shell: "sed -i 's/enabled=1/enabled=0/g' ./openshift-ansible-playbook/roles/openshift_repos/templates/CentOS-OpenShift-Origin.repo.j2"
-  when: true == {{CHANGEREPO}}
+  when: CHANGEREPO
 
 - name: copy ansible hosts
   template: src='./templates/openshift_hosts.j2' dest='/etc/ansible/hosts'
 
 - name: change web console image base
   shell: "sed -i 's/docker.io/{{Harbor_Url}}/g' ./openshift-ansible-playbook/roles/openshift_web_console/defaults/main.yml"
-  when: true == {{Change_Base_Registry}}
+  when: Change_Base_Registry
 
 - name: create dir /etc/origin/master/ if not exists
   file: path=/etc/origin/master/ state=directory
