@@ -48,7 +48,7 @@
     - gogs-cicd
     - jenkins-cicd
     - sonarqube-cicd
-    - nexus-cicd
+    - nexus3-cicd
     - jenkins-jeesite
     - jeesite-jeesite
   notify:
