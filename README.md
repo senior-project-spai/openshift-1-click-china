@@ -42,4 +42,6 @@
     <ip> os311.test.it.example.com
 #### 6. 浏览器访问
     https://os311.test.it.example.com:8443
+![CICD工具应用](https://images.gitee.com/uploads/images/2018/1211/180618_90ca6ea4_550732.png "屏幕截图.png")
 
+![自动创建Pipeline](https://images.gitee.com/uploads/images/2018/1211/180737_038ab5ba_550732.png "屏幕截图.png")
