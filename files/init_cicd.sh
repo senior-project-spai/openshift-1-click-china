@@ -11,7 +11,7 @@ deploy_app_cicd nexus3 cicd
 deploy_app_cicd sonarqube cicd
 
 oc get project jeesite  > /dev/null 2>&1 ||  oc new-project jeesite --display-name=JeeSite
-oc get dc mysql > /dev/null 2>&1 || oc new-app --template=openshift/mysql-persistent --name=mysql --param=MYSQL_USER=jeesite --param=MYSQL_PASSWORD=jeesite --param=MYSQL_ROOT_PASSWORD=jeesite --param=MYSQL_DATABASE=jeesite -n jeesite
+oc get dc mysql -n jeesite > /dev/null 2>&1 || oc new-app --template=openshift/mysql-persistent --name=mysql --param=MYSQL_USER=jeesite --param=MYSQL_PASSWORD=jeesite --param=MYSQL_ROOT_PASSWORD=jeesite --param=MYSQL_DATABASE=jeesite -n jeesite
 if [ -d jeesite ]
 then
 	cd jeesite
