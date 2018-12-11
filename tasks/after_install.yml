@@ -53,6 +53,7 @@
     - jeesite-jeesite
   notify:
     - restart dnsmasq
+  when: true == {{CICD_INSTALL}}
 
 - name: waiting for mysql up
   command: oc get dc mysql -n jeesite| grep -v NAME| awk '{print $4}'
@@ -60,7 +61,8 @@
   until: "mysql_result.stdout == '1'"
   retries: 60
   delay: 10
+  when: true == {{CICD_INSTALL}}
 
 - name: init jeesite data
   shell: table_count=$(mysql -hmysql.jeesite.svc -ujeesite -pjeesite jeesite -e "show tables;" | wc -l); if "$table_count" == "0"; mysql -hmysql.jeesite.svc -ujeesite -pjeesite jeesite < jeesite/db/jeesite_mysql.sql; fi
-
+  when: true == {{CICD_INSTALL}}
