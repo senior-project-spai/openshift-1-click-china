@@ -1,9 +1,10 @@
 #!/bin/bash
+systemctl restart nfs
 function deploy_app_cicd(){
 	t_name=$1
 	project_name=$2
 	oc get dc $t_name -n $project_name > /dev/null 2>&1 || oc new-app --template=$t_name -n $project_name 
-
+	sleep 180
 }
 
 deploy_app_cicd gogs  cicd
