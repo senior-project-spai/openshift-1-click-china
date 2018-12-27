@@ -7,8 +7,7 @@ OPENSHIFT_TEMPLATES=(redis-persistent postgresql-persistent mysql-persistent jen
 oc get project cicd > /dev/null 2>&1  || oc new-project cicd --display-name="CICD持续集成"
 
 # 设置权限
-oc get serviceaccount cicd -n cicd > /dev/null 2>&1 || oc create serviceaccount cicd -n cicd
-oc get serviceaccount cicd -n cicd > /dev/null 2>&1 || oc adm policy add-scc-to-user anyuid -z cicd -n cicd
+oc get serviceaccount cicd -n cicd > /dev/null 2>&1 || oc create serviceaccount cicd -n cicd && oc adm policy add-scc-to-user anyuid -z cicd -n cicd
 
 for temp_name in "${CICD_TEMPLATES[@]}"
 do 
