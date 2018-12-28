@@ -64,6 +64,7 @@
   until: cicd_ready_result.stdout.find("500.png") == -1
   retries: 60
   delay: 10
+  when: CICD_INSTALL
 
 - name: create default user for gogs
   shell: oc project cicd && gogspodname=$(oc get pod | grep gogs | grep -v postgresql| awk '{print $1}') && oc rsh $gogspodname /opt/gogs/gogs admin create-user --name=root --password={{GOGS_PASSWORD}} --admin=true --email={{GOGS_EMAIL}} --config=/etc/gogs/conf/app.ini
