@@ -26,8 +26,7 @@ else
 	curl -s -H "Authorization: token 6200198c6fcb7dc28e5330be0ca5fdc31c0b2a2e"  -X POST http://gogs.cicd.svc:3000/api/v1/user/repos -d 'name=jeesite&private=false'
 	if [ ! -d jeesite ]
 	then
-		wget https://gitee.com/openshiftx/jeesite/repository/archive/master.zip
-		unzip master.zip 
+		git clone https://gitee.com/openshiftx/jeesite.git
 	fi
 	cd jeesite
 	git init
