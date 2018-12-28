@@ -59,7 +59,7 @@
   when: CICD_INSTALL
 
 - name: wating for gogs up
-  shell: oc get pod -n cicd | grep gogs | grep Running|wc -l
+  shell: oc get pod -n cicd | grep gogs | grep -v deploy | grep Running|wc -l
   register: cicd_ready_result
   until: cicd_ready_result.stdout.find("2") != -1
   retries: 60
