@@ -31,7 +31,7 @@ else
 		cd jeesite_src
 		git archive --format=zip master > master.zip
 		cd ..
-		mkdir jeesite
+		mkdir -p jeesite
 		cd jeesite
 		unzip ../jeesite_src/master.zip 
 		rm -rf ../jeesite_src

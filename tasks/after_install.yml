@@ -72,7 +72,7 @@
   when: CICD_INSTALL
 
 - name: init gogs jeesite  repo and init jeesite build and pipeline
-  script: ./files/init_jeesite.sh root {{GOGS_PASSWORD}} ${{HOSTNAME}}
+  script: ./files/init_jeesite.sh root {{GOGS_PASSWORD}} {{HOSTNAME}}
   when: CICD_INSTALL
   ignore_errors: true
 
