@@ -1,9 +1,10 @@
 #!/bin/bash
 gogs_username=$1
 gogs_password=$2
+master_hostname=$3
 
 ## create token
-token=$(curl -s -u root:123456 http://gogs.cicd.svc:3000/api/v1/users/root/tokens | grep sha2 | awk -F\" '{print $8}')
+token=$(curl -s -u root:123456 http://gogs.cicd.svc:3000/api/v1/users/root/tokens | grep sha1 | awk -F\" '{print $8}')
 if [ "$token" == "" ]
 then
 	token=$(curl -s -X POST -u $gogs_username:$gogs_password http://gogs.cicd.svc:3000/api/v1/users/root/tokens -d name=default | awk -F\" '{print $8}')
@@ -40,6 +41,19 @@ else
 	git commit -m "first commit"
 	git remote add origin http://$gogs_username:$gogs_password@gogs.cicd.svc:3000/root/jeesite.git
 	git push -u origin master
+
+	curl -X POST \
+	  http://gogs.cicd.svc:3000/api/v1/repos/root/jeesite/hooks \
+	  -H "authorization: token $token" \
+	  -H 'content-type: application/json; charset=UTF-8' \
+	  -d '{
+	    "type": "gogs",
+	    "config": {
+	        "content_type": "form",
+	        "url": "https://'$master_hostname':8443/apis/build.openshift.io/v1/namespaces/jeesite/buildconfigs/jeesite-pipeline/webhooks/jeesite/generic"
+	    },
+	    "active": true
+	}'
 
 fi
 
