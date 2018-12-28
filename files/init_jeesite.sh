@@ -27,14 +27,9 @@ else
 	curl -s -H "Authorization: token $token"  -X POST http://gogs.cicd.svc:3000/api/v1/user/repos -d 'name=jeesite&private=false'
 	if [ ! -d jeesite ]
 	then
-		git clone https://gitee.com/openshiftx/jeesite.git jeesite_src
-		cd jeesite_src
-		git archive --format=zip master > master.zip
-		cd ..
-		mkdir -p jeesite
+		git clone https://gitee.com/openshiftx/jeesite.git jeesite
 		cd jeesite
-		unzip ../jeesite_src/master.zip 
-		rm -rf ../jeesite_src
+		rm -rf .git
 		git init
 		git add .
 		git commit -m "first commit"
