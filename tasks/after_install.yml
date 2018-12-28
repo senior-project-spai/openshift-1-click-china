@@ -77,7 +77,7 @@
   ignore_errors: true
 
 - name: waiting for mysql up
-  shell: oc get pod -n jeesite|grep -v deploy | grep Running | grep mysql| wc -l
+  shell: oc get pod -n jeesite|grep -v deploy | grep 1/1 | grep mysql| wc -l
   register: mysql_result
   until: mysql_result.stdout.find("1") != -1
   retries: 60
