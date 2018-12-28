@@ -58,10 +58,7 @@
     - restart dnsmasq
   when: CICD_INSTALL
 
-- name: waiting for gogs up
-  shell: 
-
-- name: wating for postgresql up
+- name: wating for gogs up
   shell: oc get pod -n cicd | grep gogs | grep Running|wc -l
   register: cicd_ready_result
   until: cicd_ready_result.stdout.find("2") != -1
