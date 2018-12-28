@@ -77,7 +77,7 @@
   ignore_errors: true
 
 - name: waiting for mysql up
-  shell: oc get dc mysql -n jeesite| grep -v NAME| awk '{print $4}'
+  shell: oc get pod -n jeesite|grep -v deploy | grep Running | grep mysql| wc -l
   register: mysql_result
   until: mysql_result.stdout.find("1") != -1
   retries: 60
@@ -85,5 +85,5 @@
   when: CICD_INSTALL
 
 - name: init jeesite data
-  shell: sleep 10; table_count=$(mysql -hmysql.jeesite.svc -ujeesite -pjeesite jeesite -e "show tables;" | wc -l); if [ "$table_count" == "0" ]; then mysql -hmysql.jeesite.svc -ujeesite -pjeesite jeesite < jeesite/db/jeesite_mysql.sql; fi
+  shell: table_count=$(mysql -hmysql.jeesite.svc -ujeesite -pjeesite jeesite -e "show tables;" | wc -l); if [ "$table_count" == "0" ]; then mysql -hmysql.jeesite.svc -ujeesite -pjeesite jeesite < jeesite/db/jeesite_mysql.sql; fi
   when: CICD_INSTALL
