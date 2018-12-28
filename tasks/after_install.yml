@@ -85,5 +85,5 @@
   when: CICD_INSTALL
 
 - name: init jeesite data
-  shell: table_count=$(mysql -hmysql.jeesite.svc -ujeesite -pjeesite jeesite -e "show tables;" | wc -l); if [ "$table_count" == "0" ]; then mysql -hmysql.jeesite.svc -ujeesite -pjeesite jeesite < jeesite/db/jeesite_mysql.sql; fi
+  shell: sleep 10; table_count=$(mysql -hmysql.jeesite.svc -ujeesite -pjeesite jeesite -e "show tables;" | wc -l); if [ "$table_count" == "0" ]; then mysql -hmysql.jeesite.svc -ujeesite -pjeesite jeesite < jeesite/db/jeesite_mysql.sql; fi
   when: CICD_INSTALL

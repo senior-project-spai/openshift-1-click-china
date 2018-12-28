@@ -27,7 +27,7 @@ else
 	curl -s -H "Authorization: token $token"  -X POST http://gogs.cicd.svc:3000/api/v1/user/repos -d 'name=jeesite&private=false'
 	if [ ! -d jeesite ]
 	then
-		git clone https://gitee.com/openshiftx/jeesite.git jeesite
+		git clone https://gitee.com/openshiftx/jeesite.git
 		cd jeesite
 		rm -rf .git
 		git init
