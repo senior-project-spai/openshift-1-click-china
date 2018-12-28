@@ -58,10 +58,13 @@
     - restart dnsmasq
   when: CICD_INSTALL
 
-- name: wating for gogs up
-  shell: curl -s  http://gogs-cicd.apps.os311.test.it.example.com/explore/repos
+- name: waiting for gogs up
+  shell: 
+
+- name: wating for postgresql up
+  shell: oc get pod -n cicd | grep gogs | grep Running|wc -l
   register: cicd_ready_result
-  until: cicd_ready_result.stdout.find("500.png") == -1
+  until: cicd_ready_result.stdout.find("2") != -1
   retries: 60
   delay: 10
   when: CICD_INSTALL
