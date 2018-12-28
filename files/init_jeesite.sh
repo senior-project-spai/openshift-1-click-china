@@ -35,13 +35,15 @@ else
 		cd jeesite
 		unzip ../jeesite_src/master.zip 
 		rm -rf ../jeesite_src
+		git init
+		git add .
+		git commit -m "first commit"
+		git remote add origin http://$gogs_username:$gogs_password@gogs.cicd.svc:3000/root/jeesite.git
+		git push -u origin master
+	else
+		git push -u origin master
 	fi
-	git init
-	git add .
-	git commit -m "first commit"
-	git remote add origin http://$gogs_username:$gogs_password@gogs.cicd.svc:3000/root/jeesite.git
-	git push -u origin master
-
+	
 	curl -X POST \
 	  http://gogs.cicd.svc:3000/api/v1/repos/root/jeesite/hooks \
 	  -H "authorization: token $token" \
