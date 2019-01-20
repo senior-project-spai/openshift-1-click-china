@@ -39,7 +39,7 @@
   script: ./files/init_openshift.sh
 
 - name: cicd install
-  script: ./files/init_cicd.sh
+  script: ./files/init_cicd.sh {{HOSTNAME}}
   when: CICD_INSTALL
   ignore_errors: true
 
