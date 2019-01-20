@@ -57,6 +57,7 @@ objects:
           - name: POSTGRESQL_ADMIN_PASSWORD
             value: ${DATABASE_ADMIN_PASSWORD}
           image: docker.io/centos/postgresql-95-centos7:latest
+          imagePullPolicy: IfNotPresent
           livenessProbe:
             initialDelaySeconds: 30
             tcpSocket:
@@ -156,7 +157,7 @@ objects:
           - name: USERNAME
             value: gogs
           image: docker.io/openshiftdemos/gogs:${GOGS_VERSION}
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           name: ${APPLICATION_NAME}
           ports:
           - containerPort: 3000
