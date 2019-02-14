@@ -14,14 +14,14 @@ spec:
     version: 1.9.0
     elasticsearch_memory: 1Gi
   kiali:
-    username: username
-    password: password
+    username: admin
+    password: admin 
     prefix: registry.access.redhat.com/openshift-istio-tech-preview/
     version: 0.13.0
   launcher:
     openshift:
-      user: user
-      password: password
+      user: admin
+      password: admin
     github:
       username: username
       token: token
