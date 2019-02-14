@@ -20,7 +20,7 @@ parameters:
 - displayName: Default Prefix
   description: The default image prefix for istio deployments
   name: OPENSHIFT_ISTIO_PREFIX
-  value: openshift-istio-tech-preview/
+  value: xhuaustc/
 - displayName: Default Version
   description: The default image version for istio deployments
   name: OPENSHIFT_ISTIO_VERSION

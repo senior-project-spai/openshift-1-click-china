@@ -7,16 +7,16 @@ spec:
   istio:
     authentication: true
     community: false
-    prefix: registry.access.redhat.com/openshift-istio-tech-preview/
+    prefix: xhuaustc/
     version: 0.7.0
   jaeger:
-    prefix: registry.access.redhat.com/distributed-tracing-tech-preview/
+    prefix: xhuaustc/
     version: 1.9.0
     elasticsearch_memory: 1Gi
   kiali:
     username: admin
     password: admin 
-    prefix: registry.access.redhat.com/openshift-istio-tech-preview/
+    prefix: xhuaustc/
     version: 0.13.0
   launcher:
     openshift:
@@ -31,8 +31,8 @@ spec:
       repo: https://github.com/fabric8-launcher/launcher-booster-catalog.git
   threeScale:
     enabled: false
-    prefix: registry.access.redhat.com/openshift-istio-tech-preview/
-    version: 0.2.0
+    prefix: xhuaustc/
+    version: v0.2.0
     adapter:
       listenAddr: 3333
       logLevel: info
