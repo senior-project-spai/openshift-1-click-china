@@ -6,7 +6,7 @@ parameters:
 - displayName: Master Public URL
   description: The public URL for master
   name: OPENSHIFT_ISTIO_MASTER_PUBLIC_URL
-  value: https://127.0.0.1:8443
+  value: https://os311.test.it.example.com:8443
 - displayName: OpenShift Release
   description: The version of the OpenShift release.
   name: OPENSHIFT_RELEASE
