@@ -23,8 +23,8 @@ spec:
       user: admin
       password: admin
     github:
-      username: username
-      token: token
+      username: shake
+      token: 246f1cefcd1289439be668f90af0bf66d35a4c84
     catalog:
       filter: booster.mission.metadata.istio
       branch: v71
