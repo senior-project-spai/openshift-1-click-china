@@ -8,7 +8,7 @@ $ ./docker-pull-images.sh
 $ oc new-project istio-operator
 $ oc new-app -f istio_product_operator_template.yaml --param=OPENSHIFT_ISTIO_MASTER_PUBLIC_URL=<master public url>
 ```
-- OPENSHIFT_ISTIO_MASTER_PUBLIC_URL为openshift集群对外的master地址，例如：https://master.example.com:8443
+- OPENSHIFT_ISTIO_MASTER_PUBLIC_URL为openshift集群对外的master地址，例如：https://os311.test.it.example.com:8443
 - OPENSHIFT_ISTIO_PREFIX为openshift istio的镜像前缀，如果将准备中的镜像都导入到了自己的私有仓库中，就可以使用它换成自己的镜像仓库地址
 > 3. 部署istio
 ```
