@@ -6,7 +6,7 @@
         "annotations": {
             "iconClass": "icon-gitlab",
             "description": "GitLab. Collaboration and source control management: code, test, and deploy together! \n\n GitLab requries that the serviceaccount for the main GitLab app be added to the anyuid security context. The service account name is: cicd",
-            "tags": "instant-app,gitlab,VCS,ci-cd,jenkins"
+            "tags": "pipelines"
         }
     },
     "labels": {

@@ -3,7 +3,7 @@ apiVersion: v1
 metadata:
   annotations:
     description: The Gogs git server (https://gogs.io/)
-    tags: instant-app,gogs,jenkins
+    tags: pipelines
     iconClass: icon-gogs
   name: gogs
 objects:

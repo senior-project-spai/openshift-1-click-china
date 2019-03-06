@@ -6,7 +6,7 @@ metadata:
   name: nexus3
   annotations:
     description: Sonatype Nexus 3 template
-    tags: ci,nexus,jenkins
+    tags: pipelines
     iconClass: icon-nexus3
 objects:
 - apiVersion: v1

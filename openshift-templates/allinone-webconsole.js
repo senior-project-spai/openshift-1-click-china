@@ -13,4 +13,21 @@
 	  href: "https://yun.baidu.com/s/1xIwYILHQebEHZOcW4yvsAw",
 	  tooltip: "一键部署Openshift相关视频"
 	}];
+
+	var category = _.find(window.OPENSHIFT_CONSTANTS.SERVICE_CATALOG_CATEGORIES,
+                      { id: 'databases' });
+	// Add Go as a new subcategory under Languages.
+	category.subCategories.splice(2,0,{ // Insert at the third spot.
+	  // Required. Must be unique.
+	  id: "redis",
+	  // Required.
+	  label: "redis",
+	  // Optional. If specified, defines a unique icon for this item.
+	  icon: "icon-redis",
+	  // Required. Items matching any tag will appear in this subcategory.
+	  tags: [
+	    "redis"
+	  ]
+	});
+
 }());
