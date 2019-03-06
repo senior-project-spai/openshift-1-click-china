@@ -17,3 +17,17 @@
   height: 80px;
   background-size: 100% 100%;
 }
+
+.icon-easymock{
+  background-image: url(https://xhua-static.sh1a.qingstor.com/allinone/easymock.png);
+  width: 60px;
+  height: 60px;
+  background-size: 100% 100%;
+}
+
+.icon-kelk{
+  background-image: url(https://xhua-static.sh1a.qingstor.com/allinone/kelk.png);
+  width: 70px;
+  height: 42px;
+  background-size: 100% 100%;
+}
