@@ -21,7 +21,7 @@ openshift_logging_curator_replicas: 1
 # simply used for naming purposes
 openshift_logging_curator_ops_deployment: false
 
-openshift_logging_curator_default_days: 30
+openshift_logging_curator_default_days: 1
 openshift_logging_curator_run_hour: 3
 openshift_logging_curator_run_minute: 30
 openshift_logging_curator_run_timezone: UTC
