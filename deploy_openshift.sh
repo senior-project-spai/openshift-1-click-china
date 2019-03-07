@@ -8,6 +8,11 @@ then
 	exit 10
 fi
 
+cat >/etc/sysctl.d/99-elasticsearch.conf <<EOF
+vm.max_map_count = 262144
+EOF
+sysctl vm.max_map_count=262144
+
 export CHANGEREPO=true
 if [ $CHANGEREPO == true -a ! -d /etc/yum.repos.d/back ]
 then
