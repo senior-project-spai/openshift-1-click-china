@@ -45,7 +45,7 @@ objects:
                 --override log.retention.hours=24 --override
                 delete.topic.enable=true
             image: 'docker.io/xhuaustc/openshift-kafka:latest'
-            imagePullPolicy: Always
+            imagePullPolicy: IfNotPresent
             name: apache-kafka
             ports:
               - containerPort: 9092
@@ -75,7 +75,7 @@ objects:
             command:
               - bin/zookeeper-server-start.sh
             image: 'docker.io/xhuaustc/openshift-kafka:latest'
-            imagePullPolicy: Always
+            imagePullPolicy: IfNotPresent
             name: apache-zookeeper
             ports:
               - containerPort: 2181
@@ -172,7 +172,7 @@ objects:
       spec:
         containers:
           - image: 'docker.io/xhuaustc/logstash:6.6.1'
-            imagePullPolicy: Always
+            imagePullPolicy: IfNotPresent
             name: logstash
             ports:
               - containerPort: 5044
@@ -288,7 +288,7 @@ objects:
               - name: discovery.type
                 value: single-node
             image: 'docker.io/xhuaustc/elasticsearch:6.6.1'
-            imagePullPolicy: Always
+            imagePullPolicy: IfNotPresent
             name: elasticsearch
             ports:
               - containerPort: 9200
@@ -406,7 +406,7 @@ objects:
               - name: ELASTICSEARCH_HOSTS
                 value: 'http://$(ELASTICSEARCH_SERVICE_HOST):9200'
             image: 'docker.io/xhuaustc/kibana:6.6.1'
-            imagePullPolicy: Always
+            imagePullPolicy: IfNotPresent
             livenessProbe:
               failureThreshold: 3
               initialDelaySeconds: 60
