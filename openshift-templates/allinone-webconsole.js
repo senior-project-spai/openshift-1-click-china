@@ -30,4 +30,25 @@
 	  ]
 	});
 
+	window.OPENSHIFT_CONSTANTS.SERVICE_CATALOG_CATEGORIES.push({
+	  // Required. Must be unique.
+	  id: "messages",
+	  // Required
+	  label: "MQ",
+	  subCategories: [
+	    {
+	      // Required. Must be unique.
+	      id: "Messages",
+	      // Required.
+	      label: "MQ",
+	      // Optional. If specified, defines a unique icon for this item.
+	      icon: "icon-rabbitmq",
+	      // Required. Items matching any tag will appear in this subcategory.
+	      tags: [
+	        "rabbitmq"
+	      ]
+	    }
+	  ]
+	});
+
 }());
