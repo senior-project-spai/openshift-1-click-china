@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Template
 metadata:
-  name: rabbitmq-cluster
+  name: rabbitmq
   annotations:
     description: "Deploys a RabbitMQ cluster"
     iconClass: icon-rabbitmq
