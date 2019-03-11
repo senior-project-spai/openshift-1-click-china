@@ -133,7 +133,7 @@ objects:
     name: ${CLUSTER_NAME}
   spec:
     port:
-      targetPort: 8081-tcp
+      targetPort: http
     to:
       kind: Service
       name: ${CLUSTER_NAME}-balancer
