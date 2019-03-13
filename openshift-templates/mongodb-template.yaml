@@ -1,0 +1,354 @@
+apiVersion: v1
+kind: Template
+labels:
+  template: mongodb-openshift-dev-preview-template
+message: |-
+  This is the MongoDB Enterprise Openshift Developer Preview.
+  Sweet!
+metadata:
+  annotations:
+    description: |-
+      Provisions MongoDB replica set and agent-only pods which are managed by MongoDB Ops Manager.
+      NOTE: Sharded clusters are not supported yet. Security is not automatically enabled.
+    iconClass: icon-mongodb
+    openshift.io/display-name: MongoDB Enterprise
+    openshift.io/documentation-url: https://docs.openshift.org/latest/using_images/db_images/mongodb.html
+    openshift.io/long-description: This template provisions a MongoDB replica set
+      which is managed by an instance of MongoDB Ops Manager.
+    openshift.io/provider-display-name: MongoDB, Inc.
+    openshift.io/support-url: https://access.redhat.com
+    tags: database,mongodb
+  name: mongodb
+  uid: d50820c0-32ef-11e8-944b-12f4b1c41cea
+objects:
+- apiVersion: v1
+  kind: ServiceAccount
+  metadata:
+   name: mongodb-${MMS_PROJECT_NAME}-${CLUSTER_NAME}-secret-access-sa
+   namespace: ${NAMESPACE} 
+   labels:
+     app: mongodb-${MMS_PROJECT_NAME}-${CLUSTER_NAME}
+- apiVersion: rbac.authorization.k8s.io/v1beta1
+  kind: ClusterRole
+  metadata:
+    name: ${CLUSTER_NAME}-mongodb-secret-access-cr
+    labels:
+      app: mongodb-${MMS_PROJECT_NAME}-${CLUSTER_NAME}
+  rules:
+  - apiGroups: [""] # "" indicates the core API group
+    resources: ["pods", "secrets"] 
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiVersion: rbac.authorization.k8s.io/v1beta1
+  kind: ClusterRoleBinding
+  metadata:
+    name: ${CLUSTER_NAME}-mongodb-secret-access-rb
+    labels:
+      app: mongodb-${MMS_PROJECT_NAME}-${CLUSTER_NAME}
+  subjects:
+  - kind: ServiceAccount
+    name: mongodb-${MMS_PROJECT_NAME}-${CLUSTER_NAME}-secret-access-sa
+    namespace: ${NAMESPACE} 
+  roleRef:
+    kind: ClusterRole
+    name: ${CLUSTER_NAME}-mongodb-secret-access-cr
+    apiGroup: rbac.authorization.k8s.io
+- apiVersion: v1
+  kind: Secret
+  metadata:
+    annotations:
+      template.openshift.io/expose-base-url: '{.data[''MMS_BASE_URL'']}'
+      template.openshift.io/expose-cluster-name: '{.data[''CLUSTER_NAME'']}'
+      template.openshift.io/expose-project-name: '{.data[''MMS_PROJECT_NAME'']}'
+      template.openshift.io/expose-user: '{.data[''MMS_USER'']}'
+      template.openshift.io/expose-user-apikey: '{.data[''MMS_USER_APIKEY'']}'
+    name: ${CLUSTER_NAME}-secret
+    labels:
+      app: mongodb-${MMS_PROJECT_NAME}-${CLUSTER_NAME}
+  namespace: ${NAMESPACE}
+  state: present
+  stringData:
+    base-url: ${MMS_BASE_URL}
+    cluster-name: ${CLUSTER_NAME}
+    project-name: ${MMS_PROJECT_NAME}
+    mms-user: ${MMS_USER}
+    mms-user-apikey: ${MMS_USER_APIKEY}
+    agent-rpm: ${AGENT_RPM}
+  type: Opaque
+- apiVersion: apps/v1beta1
+  kind: StatefulSet
+  metadata:
+    name: mongodb-${MMS_PROJECT_NAME}-${CLUSTER_NAME}
+    labels:
+      app: mongodb-${MMS_PROJECT_NAME}-${CLUSTER_NAME}
+  spec:
+    replicas: ${NUMBER_PODS_RS}
+    serviceName: mongodb-${MMS_PROJECT_NAME}-${CLUSTER_NAME}
+    template:
+      metadata:
+        labels:
+          app: mongodb-${MMS_PROJECT_NAME}-${CLUSTER_NAME}
+      spec:
+        serviceAccountName: mongodb-${MMS_PROJECT_NAME}-${CLUSTER_NAME}-secret-access-sa
+        initContainers:
+        - name: mms-node-init
+          image: centos
+          command:
+          - /bin/sh
+          - -c
+          - |
+            set -ex
+            echo "Attempt to configure MongoDB Ops Manager Project & apikeys"
+            echo "Check if we have mms project and apikey info in existing secret"
+            TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+            K8S="https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"
+            CACERT="/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+            NAMESPACE=$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)
+            SECRET_NAME=$(echo "mms-project-${MMS_PROJECT_NAME}-secret" | tr '[:upper:]' '[:lower:]')
+            echo "Contacting ${K8S} in namespace '${NAMESPACE}' for the keys 'mmsGroupId' & 'mmsAgentApikey' in secret '${SECRET_NAME}'"
+            SECRET_STUFF=$(curl -vvvsSk --cacert $CACERT -H "Authorization: Bearer ${TOKEN}" ${K8S}/api/v1/namespaces/${NAMESPACE}/secrets/${SECRET_NAME}) 
+            KIND=$(echo ${SECRET_STUFF} | python -c 'import sys,json,base64,os;r=json.load(sys.stdin); print r["kind"]')
+            echo "KIND=${KIND}"
+            if [ "${KIND}" == "Secret" ]; 
+            then 
+              MMS_GROUP_ID=$(echo ${SECRET_STUFF} |  python -c 'import sys,json,base64;r=json.load(sys.stdin);print base64.b64decode(r["data"]["mmsGroupId"])') 
+              MMS_AGENT_APIKEY=$(echo ${SECRET_STUFF} |  python -c 'import sys,json,base64;r=json.load(sys.stdin);print base64.b64decode(r["data"]["mmsAgentApikey"])') 
+            fi
+            if [ "${KIND}" == "Status" ];
+            then 
+              echo "${SECRET_STUFF}"
+              echo "If not, then we need to create the group"
+              echo "Fetch MongoDB Ops Manager project (group) information"
+              echo "(next command does a POST with the project name, this will either create a project or return project information)"
+              curl --header "Content-Type: application/json" --header "Accept: application/json" -u "${MMS_USER}:${MMS_USER_APIKEY}" --digest "${MMS_BASE_URL}api/public/v1.0/groups" -d '{"name":"${MMS_PROJECT_NAME}"}' > /mms-config/group.${MMS_PROJECT_NAME}.json
+              cat /mms-config/group.${MMS_PROJECT_NAME}.json
+              MMS_GROUP_ID=$(cat /mms-config/group.${MMS_PROJECT_NAME}.json | python -c 'import sys, json; r = json.load(sys.stdin);print r["id"]')
+              MMS_AGENT_APIKEY=$(cat /mms-config/group.${MMS_PROJECT_NAME}.json | python -c 'import sys, json; r = json.load(sys.stdin);print r["agentApiKey"]')
+              temp=$(mktemp)
+              echo { \"kind\": \"Secret\", \"apiVersion\": \"v1\", \"metadata\": { \"name\": \"${SECRET_NAME}\" }, \"stringData\": { \"mmsGroupId\": \"${MMS_GROUP_ID}\", \"mmsAgentApikey\" : \"${MMS_AGENT_APIKEY}\" } } > ${temp}
+              SR=$(curl -k -X POST -H "Authorization: Bearer $TOKEN" -H 'Accept: application/json' -H 'Content-Type: application/json' ${K8S}/api/v1/namespaces/$NAMESPACE/secrets --data "@${temp}")
+              K_SR=$(echo ${SR} | python -c 'import sys,json,base64,os;r=json.load(sys.stdin); print r["kind"]')
+              if [ "${KIND}" == "Status" ] 
+              then 
+                STATUS=$(echo ${SR} | python -c 'import sys,json,base64,os;r=json.load(sys.stdin); print r["status"]')
+                echo "Attempting to create '${SECRET_NAME}' got Status.status='${STATUS}'"
+                exit 1
+              fi
+              echo "Created Secret '${SECRET_NAME}' Response: '${SR}'"
+            fi
+            if [ -z ${MMS_GROUP_ID+x} ]
+            then
+              echo "[ERROR] Unable to set MMS_GROUP_ID, cannot continue."
+              exit 1
+            fi
+            if [ -z ${MMS_AGENT_APIKEY+x} ]
+            then
+              echo "[ERROR] Unable to set MMS_AGENT_APIKEY, cannot continue."
+              exit 1
+            fi
+            
+            echo "Found MMS_GROUP_ID=${MMS_GROUP_ID} for Ops Manager Project '${MMS_PROJECT_NAME}'"
+            echo "Found MMS_AGENT_APIKEY=${MMS_AGENT_APIKEY} for Ops Manager Project '${MMS_PROJECT_NAME}'"
+            echo "Storing MongoDB Ops Manager configuration in shared mount '/mms-config/mms-env.sh'"
+            echo "#!/bin/sh" > /mms-config/mms-env.sh
+            echo "export MMS_PROJECT_NAME=${MMS_PROJECT_NAME}" >> /mms-config/mms-env.sh
+            echo "export MMS_GROUP_ID=${MMS_GROUP_ID}" >> /mms-config/mms-env.sh
+            echo "export MMS_AGENT_APIKEY=${MMS_AGENT_APIKEY}" >> /mms-config/mms-env.sh
+          volumeMounts:
+          - name: mms-config
+            mountPath: /mms-config
+          env:
+          - name: MMS_BASE_URL
+            valueFrom:
+              secretKeyRef:
+                key: base-url
+                name: ${CLUSTER_NAME}-secret
+          - name: MMS_USER
+            valueFrom:
+              secretKeyRef:
+                key: mms-user
+                name: ${CLUSTER_NAME}-secret
+          - name: MMS_USER_APIKEY
+            valueFrom:
+              secretKeyRef:
+                key: mms-user-apikey
+                name: ${CLUSTER_NAME}-secret
+          - name: MMS_PROJECT_NAME
+            valueFrom:
+              secretKeyRef:
+                key: project-name
+                name: ${CLUSTER_NAME}-secret
+        containers:
+        - args:
+          command:
+          - /bin/sh
+          - -c
+          - |
+            set -ex
+            if [ ! -f /mms-config/mms-env.sh ]; then
+              echo "[ERROR] MongoDB Ops Manager configration not found."
+              echo "[ERROR] File '/mms-config/mms-env.sh' does not exist."
+              echo "[ERROR] Check Init Container 'mms-node-init' logs. (oc logs <pod_name> -c mms-node-init)."
+              exit 1
+            fi
+            source /mms-config/mms-env.sh 
+            # /download/agent/automation/mongodb-mms-automation-agent-latest.linux_x86_64.tar.gz
+            AGENT_URL=${MMS_BASE_URL}download/agent/automation/  
+            echo "MongoDB Ops Manager - Openshift Developer Preview"
+            echo "MMS_PROJECT_NAME='${MMS_PROJECT_NAME}'"
+            echo "MMS_GROUP_ID='${MMS_GROUP_ID}'"
+            echo "MMS_AGENT_APIKEY='${MMS_AGENT_APIKEY}'"
+            echo "Downloading ${AGENT_URL}${AGENT_RPM}" 
+            curl -OL "${AGENT_URL}${AGENT_RPM}"
+            echo "Installing ${AGENT_RPM}" 
+            rpm -U "${AGENT_RPM}"
+            echo "Updating /etc/mongodb-mms/automation-agent.config with:" 
+            echo "mmsGroupId=${MMS_GROUP_ID}" 
+            echo "mmsApiKey=${MMS_AGENT_APIKEY}" 
+            echo "mmsBaseUrl=${MMS_BASE_URL}" 
+            export MMS_BASE_URL_TRIMMED="${MMS_BASE_URL%/}"
+            echo "mmsBaseUrl (trimmed of trailing slash for automation-agent.config)=${MMS_BASE_URL_TRIMMED}" 
+            echo "mmsGroupId=${MMS_GROUP_ID}" > /etc/mongodb-mms/automation-agent.config 
+            echo "mmsApiKey=${MMS_AGENT_APIKEY}" >> /etc/mongodb-mms/automation-agent.config 
+            echo "mmsBaseUrl=${MMS_BASE_URL_TRIMMED}" >> /etc/mongodb-mms/automation-agent.config 
+            chown mongod:mongod /data 
+            echo "Creating /var/run/mongodb-mms-automation" 
+            /usr/bin/mkdir -p /var/run/mongodb-mms-automation 
+            /usr/bin/chown -R mongod:mongod /var/run/mongodb-mms-automation 
+            echo "Starting automation agent..." 
+            MMS_LOG_DIR=/var/log/mongodb-mms-automation
+            /opt/mongodb-mms-automation/bin/mongodb-mms-automation-agent \
+            -f /etc/mongodb-mms/automation-agent.config \
+            -pidfilepath /var/run/mongodb-mms-automation/mongodb-mms-automation-agent.pid \
+            -logLevel DEBUG \
+            -logFile ${MMS_LOG_DIR}/automation-agent.log \
+            >> ${MMS_LOG_DIR}/automation-agent-fatal.log 2>&1 &
+            echo "MongoDB Ops Manager automation agent assigned to project '${MMS_PROJECT_NAME}' started `date`." 
+            echo "-- Reading automation agent log file forever"
+            VERBOSE_LOG="${MMS_LOG_DIR}/automation-agent-verbose.log"
+            if [ ! -f ${VERBOSE_LOG} ]; then
+               echo "${VERBOSE_LOG} not found, checking again in 2 seconds."
+               sleep 2
+            fi
+            echo "${VERBOSE_LOG} was found."
+            tail -F ${VERBOSE_LOG}
+          env:
+          - name: MMS_BASE_URL
+            valueFrom:
+              secretKeyRef:
+                key: base-url
+                name: ${CLUSTER_NAME}-secret
+          - name: AGENT_RPM
+            valueFrom:
+              secretKeyRef:
+                key: agent-rpm
+                name: ${CLUSTER_NAME}-secret
+          image: centos
+          name: mongodb-${MMS_PROJECT_NAME}-${CLUSTER_NAME}
+          ports: null
+          volumeMounts:
+          - mountPath: /data
+            name: pvc
+          - mountPath: /mms-config
+            name: mms-config
+        terminationGracePeriodSeconds: "10"
+        volumes:
+        - name: mms-config
+          emptyDir: {}
+    volumeClaimTemplates:
+    - name: "pvc"
+      metadata:
+        name: "pvc"
+        labels:
+          app: mongodb-${MMS_PROJECT_NAME}-${CLUSTER_NAME}
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: ${DISK_SIZE_GB}Gi
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      name: mongodb-${MMS_PROJECT_NAME}-${CLUSTER_NAME}
+      replSet: ${CLUSTER_NAME}
+      app: mongodb-${MMS_PROJECT_NAME}-${CLUSTER_NAME}
+    name: mongodb-${MMS_PROJECT_NAME}-${CLUSTER_NAME}
+  spec:
+    clusterIp: None
+    ports:
+    - name: mongodb-${MMS_PROJECT_NAME}-${CLUSTER_NAME}
+      port: ${MONGODB_PORT}
+    selector:
+      app: mongodb-${MMS_PROJECT_NAME}-${CLUSTER_NAME}
+parameters:
+- description: The namespace to create a cluster in.
+  displayName: Namespace
+  name: NAMESPACE
+  required: true
+- description: Maximum amount of memory the container can use.
+  displayName: Memory Limit
+  name: MEMORY_LIMIT
+  required: true
+  value: 512Mi
+- description: URL for MongoDB Ops Manager
+  displayName: Ops Manager URL
+  name: MMS_BASE_URL
+  required: true
+  value: http://mongodb-opsmgr:8080/
+- description: MongoDB Ops Manager User
+  displayName: Ops Manager user
+  name: MMS_USER
+  required: true
+  value: mongodude@mongorocks.com
+- description: MongoDB Ops Manager API key for user
+  displayName: User"s Ops Manager API key
+  name: MMS_USER_APIKEY
+  required: true
+  value: 45fbcc0d-2667-41e0-996e-0555ff62baca
+- description: Name for Ops Manager Project
+  displayName: Project to create replica set in
+  from: openshift-[a-z0-9]{3}
+  generate: expression
+  name: MMS_PROJECT_NAME
+  required: true
+- description: Automation Agent RPM
+  displayName: Full automation agent rpm filename, this may vary depending on your version of Ops Manager
+  name: AGENT_RPM
+  required: true
+  value: "mongodb-mms-automation-agent-manager-5.4.0.5405-1.x86_64.rhel7.rpm"
+- description: API Timeout
+  displayName: MongoDB Ops Manager API Timeout in seconds
+  name: MMS_API_TIMEOUT
+  required: true
+  value: "30"
+- description: Cluster Name
+  displayName: MongoDB Cluster Name
+  from: cluster-[a-z0-9]{5}
+  generate: expression
+  name: CLUSTER_NAME
+  required: true
+- description: Path for MongoDB data files in container
+  displayName: Path for data files
+  name: MONGODB_DBPATH
+  required: true
+  value: /data
+- description: Log file destination
+  displayName: Full path and name of database logfile
+  name: MONGODB_LOGPATH
+  required: true
+  value: /data/mongodb.log
+- description: MongoDB port
+  displayName: Port for MongoDB to listen on
+  name: MONGODB_PORT
+  required: true
+  value: "27000"
+- description: Size of disk
+  displayName: Size in Gb for persistent storage claim on data node
+  name: DISK_SIZE_GB
+  required: true
+  value: "5"
+- description: Number of members in replica set
+  displayName: Number of nodes in Replica Set
+  name: NUMBER_PODS_RS
+  required: true
+  value: "3"
