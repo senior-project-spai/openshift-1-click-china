@@ -1,7 +1,7 @@
 #!/bin/bash
 OPENSHIFT_TEMPLATE_DIR='./openshift-templates'
 CICD_TEMPLATES=(gogs gitlab nexus3 sonarqube easymock kelk)
-OPENSHIFT_TEMPLATES=(redis-persistent postgresql-persistent mysql-persistent jenkins-ephemeral rabbitmq kafka mongodb)
+OPENSHIFT_TEMPLATES=(redis-persistent postgresql-persistent mysql-persistent jenkins-ephemeral rabbitmq kafka mongodb dubbo)
 
 # create project CI
 oc get project cicd > /dev/null 2>&1  || oc new-project cicd --display-name="CICD持续集成"
