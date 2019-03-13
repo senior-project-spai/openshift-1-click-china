@@ -180,6 +180,11 @@ objects:
               - containerPort: 9600
                 protocol: TCP
             resources: {}
+            initContainers:
+              name: init-scheduler
+              image: busybox
+              command: ['sh', '-c', 'until nslookup apache-kafka || nslookup elasticsearch ; do echo waiting for apache-kafka; sleep 2; done;']
+              restartPolicy: Always
             terminationMessagePath: /dev/termination-log
             terminationMessagePolicy: File
             volumeMounts:
@@ -407,6 +412,11 @@ objects:
                 value: 'http://$(ELASTICSEARCH_SERVICE_HOST):9200'
             image: 'docker.io/xhuaustc/kibana:6.6.1'
             imagePullPolicy: IfNotPresent
+            initContainers:
+              name: init-scheduler
+              image: busybox
+              command: ['sh', '-c', 'until nslookup elasticsearch; do echo waiting for elasticsearch; sleep 2; done;']
+              restartPolicy: Always
             livenessProbe:
               failureThreshold: 3
               initialDelaySeconds: 60

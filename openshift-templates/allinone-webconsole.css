@@ -38,3 +38,10 @@
   height: 35px;
   background-size: 100% 100%;
 }
+
+.icon-dubbo{
+  background-image: url(https://xhua-static.sh1a.qingstor.com/allinone/dubbo.png);
+  width: 72px;
+  height: 18px;
+  background-size: 100% 100%;
+}
