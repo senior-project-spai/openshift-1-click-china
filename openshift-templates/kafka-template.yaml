@@ -4,7 +4,7 @@ metadata:
   name: kafka
   annotations:
     description: Kafka is used for building real-time data pipelines and streaming apps. 
-    tags: instant-app,mq,messages
+    tags: instant-app,mq,messaging
     iconClass: icon-kafka
 objects:
 - kind: DeploymentConfig

@@ -45,7 +45,7 @@
 	      icon: "icon-rabbitmq",
 	      // Required. Items matching any tag will appear in this subcategory.
 	      tags: [
-	        "rabbitmq"
+	        "messaging"
 	      ]
 	    }
 	  ]
