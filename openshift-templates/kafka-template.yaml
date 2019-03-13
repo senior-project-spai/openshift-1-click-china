@@ -62,13 +62,6 @@ objects:
               tcpSocket:
                 port: 9092
               timeoutSeconds: 1
-            resources:
-              limits:
-                cpu: '2'
-                memory: 4Gi
-              requests:
-                cpu: '1'
-                memory: 2Gi
           - args:
               - config/zookeeper.properties
             command:
@@ -93,13 +86,6 @@ objects:
               tcpSocket:
                 port: 2181
               timeoutSeconds: 1
-            resources:
-              limits:
-                cpu: '1'
-                memory: 2Gi
-              requests:
-                cpu: '1'
-                memory: 2Gi    
         dnsPolicy: ClusterFirst
         hostname: apache-kafka
         restartPolicy: Always
