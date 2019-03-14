@@ -82,7 +82,7 @@ objects:
           - --desiredContainers
           - "2"
           - --seleniumImageName
-          - public/selenium:3
+          - xhuaustc/selenium:3
           env:
           - name: ZALENIUM_KUBERNETES_CPU_REQUEST
             value: 500m
