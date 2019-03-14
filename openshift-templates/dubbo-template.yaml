@@ -127,7 +127,7 @@ objects:
     name: apache-dubbo-zookeeper
   spec:
     port:
-      targetPort: 8080
+      targetPort: apache-dubbo
     to:
       kind: Service
       name: apache-dubbo-zookeeper
