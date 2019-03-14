@@ -12,6 +12,7 @@ CICD_IMAGES=(gitlab/gitlab-ce:11.4.0-ce.0 \
 	xhuaustc/openshift-kafka:latest \
 	xhuaustc/logstash:6.6.1 \
 	xhuaustc/elasticsearch:6.6.1 \
+	xhuaustc/zalenium:3 \
 	xhuaustc/kibana:6.6.1 \
 	rabbitmq:3.7-management \
 	curiouser/dubbo_zookeeper:v1)
