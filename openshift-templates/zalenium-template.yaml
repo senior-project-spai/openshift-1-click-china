@@ -44,6 +44,18 @@ objects:
     - create
     - get
 
+- apiVersion: authorization.openshift.io/v1
+  kind: RoleBinding
+  metadata:
+    name: zalenium-role
+  roleRef:
+    name: zalenium-role
+  subjects:
+  - kind: ServiceAccount
+    name: cicd
+  userNames:
+  - system:serviceaccount:cicd:cicd
+
 - apiVersion: v1
   kind: DeploymentConfig
   metadata:
@@ -96,6 +108,7 @@ objects:
             name: volume-061x0
         dnsPolicy: ClusterFirst
         restartPolicy: Always
+        serviceAccount: cicd
         volumes:
         - name: volume-061x0
           persistentVolumeClaim:
