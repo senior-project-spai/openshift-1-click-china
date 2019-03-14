@@ -325,10 +325,10 @@ objects:
         schedulerName: default-scheduler
         securityContext: {}
         terminationGracePeriodSeconds: 30
-#        volumes:
-#          - name: volume-elasticsearch-data
-#            persistentVolumeClaim:
-#              claimName: pvc-elasticsearch-data
+       volumes:
+         - name: volume-elasticsearch-data
+           persistentVolumeClaim:
+             claimName: pvc-elasticsearch-data
     test: false
     triggers:
       - type: ConfigChange
@@ -357,21 +357,19 @@ objects:
     type: ClusterIP
 
 #===================================ElasticSearch PVC==========================
-#- kind: PersistentVolumeClaim
-#  apiVersion: v1
-#  metadata:
-#    name: pvc-elasticsearch-data
-#    labels:
-#      app: elasticsearch
-#      PersistentVolumeClaim: elasticsearch
-#
-#  spec:
-#    accessModes:
-#    - ReadWriteOnce
-#    resources:
-#      requests:
-#        storage: "20Gi"
-#    storageClassName: ceph-rbd-sc
+- kind: PersistentVolumeClaim
+  apiVersion: v1
+  metadata:
+    name: pvc-elasticsearch-data
+    labels:
+      app: elasticsearch
+      PersistentVolumeClaim: elasticsearch
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: "10Gi"
 #===================================Kibana DC==============================          
 - kind: DeploymentConfig
   apiVersion: v1
@@ -426,6 +424,11 @@ objects:
                 port: 5601
               timeoutSeconds: 1
             name: kibana
+            initContainers:
+              name: init-scheduler
+              image: busybox
+              command: ['sh', '-c', 'until nslookup elasticsearch; do echo waiting for elasticsearch; sleep 2; done;']
+              restartPolicy: Always
             ports:
               - containerPort: 5601
                 protocol: TCP
