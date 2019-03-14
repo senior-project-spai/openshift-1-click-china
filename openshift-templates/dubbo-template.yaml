@@ -20,11 +20,11 @@ objects:
   metadata:
     labels:
       app: dubbo
-    name: dubbo
+    name: apache-dubbo-zookeeper
   spec:
     replicas: 1
     selector:
-      deploymentconfig: dubbo
+      deploymentconfig: apache-dubbo-zookeeper
     strategy:
       activeDeadlineSeconds: 21600
       resources: {}
@@ -38,7 +38,7 @@ objects:
     template:
       metadata:
         labels:
-          deploymentconfig: dubbo
+          deploymentconfig: apache-dubbo-zookeeper
       spec:
         containers:
           - command:
@@ -52,7 +52,7 @@ objects:
               - name: ZOOKEEPER_SERVICE
                 value: ${ZOOKEEPER_SERVICE}
             imagePullPolicy: Always
-            name: dubbo
+            name: apache-dubbo
             ports:
               - containerPort: 8080
                 protocol: TCP
@@ -60,19 +60,12 @@ objects:
             terminationMessagePolicy: File
             readinessProbe:
               failureThreshold: 3
-              initialDelaySeconds: 60
+              initialDelaySeconds: 35
               periodSeconds: 10
               successThreshold: 1
               tcpSocket:
                 port: 8080
               timeoutSeconds: 1
-            resources:
-              limits:
-                cpu: '2'
-                memory: 4Gi
-              requests:
-                cpu: '1'
-                memory: 2Gi
           - name: apache-zookeeper
             command:
               - /bin/sh
@@ -90,7 +83,7 @@ objects:
             terminationMessagePolicy: File
             readinessProbe:
               failureThreshold: 3
-              initialDelaySeconds: 60
+              initialDelaySeconds: 35
               periodSeconds: 10
               successThreshold: 1
               tcpSocket:
@@ -101,7 +94,6 @@ objects:
         restartPolicy: Always
         schedulerName: default-scheduler
         securityContext: {}
-        serviceAccount: dubbo
         terminationGracePeriodSeconds: 30
     test: false
     triggers:
@@ -112,39 +104,32 @@ objects:
   metadata:
     labels:
       app: dubbo-zookeeper
-    name: dubbo-zookeeper
+    name: apache-dubbo-zookeeper
   spec:
     ports:
-      - name: dubbo
+      - name: apache-dubbo
         port: 8080
         protocol: TCP
         targetPort: 8080
-      - name: zookeeper
+      - name: apache-zookeeper
         port: 2181
         protocol: TCP
         targetPort: 2181
     selector:
-      deploymentconfig: dubbo
+      deploymentconfig: apache-dubbo-zookeeper
     sessionAffinity: None
     type: ClusterIP
 - kind: Route
   apiVersion: v1 
   metadata:
     labels:
-      app: dubbo-zookeeper
-    name: dubbo-zookeeper
+      app: apache-dubbo-zookeeper
+    name: apache-dubbo-zookeeper
   spec:
     port:
-      targetPort: dubbo
+      targetPort: apache-dubbo
     to:
       kind: Service
-      name: dubbo-zookeeper
+      name: apache-dubbo-zookeeper
       weight: 100
     wildcardPolicy: None
-- kind: ServiceAccount
-  apiVersion: v1
-  metadata:
-    name: dubbo
-    labels:
-      app: "dubbo"
-      serviceAccount: "dubbo" 
