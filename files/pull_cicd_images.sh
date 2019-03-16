@@ -16,7 +16,10 @@ CICD_IMAGES=(gitlab/gitlab-ce:11.4.0-ce.0 \
 	xhuaustc/selenium:3 \
 	xhuaustc/kibana:6.6.1 \
 	rabbitmq:3.7-management \
-	curiouser/dubbo_zookeeper:v1)
+	curiouser/dubbo_zookeeper:v1 \
+	blackcater/easy-mock:1.6.0 \
+	mongo:4.1 \
+	redis:5)
 
 for image in "${CICD_IMAGES[@]}"
 do
