@@ -82,6 +82,11 @@ objects:
             container-entrypoint run-mysqld
           image: centos/mysql-57-centos7:latest
           imagePullPolicy: IfNotPresent
+          initContainers:
+              name: init-scheduler
+              image: busybox
+              command: ['sh', '-c', 'until nslookup apollo-mysql; do echo waiting for apollo mysql; sleep 2; done;']
+              restartPolicy: Always
           livenessProbe:
             initialDelaySeconds: 30
             tcpSocket:
@@ -165,6 +170,11 @@ objects:
             value: -Xms2048M -Xmx3072M
           image: docker.io/xhuaustc/apolloconfigadmin:latest
           imagePullPolicy: IfNotPresent
+          initContainers:
+              name: init-scheduler
+              image: busybox
+              command: ['sh', '-c', 'until nslookup apollo-mysql; do echo waiting for apollo mysql; sleep 2; done;']
+              restartPolicy: Always
           livenessProbe:
             httpGet:
               path: /info
