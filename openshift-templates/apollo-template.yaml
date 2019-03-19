@@ -23,17 +23,17 @@ objects:
   metadata:
     annotations:
       template.openshift.io/expose-uri: mysql://{.spec.clusterIP}:{.spec.ports[?(.name=="mysql")].port}
-    name: apolloconfig-mysql
+    name: apollo-mysql
   spec:
     ports:
     - name: mysql
       port: 3306
     selector:
-      name: apolloconfig-mysql
+      name: apollo-mysql
 - apiVersion: v1
   kind: PersistentVolumeClaim
   metadata:
-    name: apolloconfig-mysql
+    name: apollo-mysql
   spec:
     accessModes:
     - ReadWriteOnce
@@ -43,19 +43,19 @@ objects:
 - apiVersion: v1
   kind: DeploymentConfig
   metadata:
-    name: apolloconfig-mysql
+    name: apollo-mysql
     labels:
       app: apollo
   spec:
     replicas: 1
     selector:
-      name: apolloconfig-mysql
+      name: apollo-mysql
     strategy:
       type: Recreate
     template:
       metadata:
         labels:
-          name: apolloconfig-mysql
+          name: apollo-mysql
       spec:
         containers:
         - env:
@@ -73,13 +73,13 @@ objects:
                 name: apollo-mysql
           - name: MYSQL_DATABASE
             value: ApolloConfigDB
-          - command:
-            - /bin/sh
-            - '-c'
-            - >-
-              mkdir mysql-init; curl -o mysql-init/init-apollo-db.sh
-              https://gitee.com/xhua/OpenshiftOneClick/raw/3.11/files/apollo/init-apollo-db.sh;
-              container-entrypoint run-mysqld
+          command:
+          - /bin/sh
+          - '-c'
+          - >-
+            mkdir mysql-init; curl -o mysql-init/init-apollo-db.sh
+            https://gitee.com/xhua/OpenshiftOneClick/raw/3.11/files/apollo/init-apollo-db.sh;
+            container-entrypoint run-mysqld
           image: centos/mysql-57-centos7:latest
           imagePullPolicy: IfNotPresent
           livenessProbe:
@@ -102,99 +102,13 @@ objects:
             timeoutSeconds: 1
           volumeMounts:
           - mountPath: /var/lib/mysql/data
-            name: apolloconfig-mysql-data
+            name: apollo-mysql-data
         volumes:
-        - name: apolloconfig-mysql-data
+        - name: apollo-mysql-data
           persistentVolumeClaim:
-            claimName: apolloconfig-mysql
+            claimName: apollo-mysql
     triggers:
     - type: ConfigChange
-
-- apiVersion: v1
-  kind: Service
-  metadata:
-    annotations:
-      template.openshift.io/expose-uri: mysql://{.spec.clusterIP}:{.spec.ports[?(.name=="mysql")].port}
-    name: apolloportal-mysql
-  spec:
-    ports:
-    - name: mysql
-      port: 3306
-    selector:
-      name: apolloportal-mysql
-- apiVersion: v1
-  kind: PersistentVolumeClaim
-  metadata:
-    name: apolloportal-mysql
-  spec:
-    accessModes:
-    - ReadWriteOnce
-    resources:
-      requests:
-        storage: 10Gi
-- apiVersion: v1
-  kind: DeploymentConfig
-  metadata:
-    name: apolloportal-mysql
-    labels:
-      app: apollo
-  spec:
-    replicas: 1
-    selector:
-      name: apolloportal-mysql
-    strategy:
-      type: Recreate
-    template:
-      metadata:
-        labels:
-          name: apolloportal-mysql
-      spec:
-        containers:
-        - env:
-          - name: MYSQL_USER
-            value: apollo
-          - name: MYSQL_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                key: database-password
-                name: apollo-mysql
-          - name: MYSQL_ROOT_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                key: database-password
-                name: apollo-mysql
-          - name: MYSQL_DATABASE
-            value: ApolloPortalDB
-          image: centos/mysql-57-centos7:latest
-          imagePullPolicy: IfNotPresent
-          livenessProbe:
-            initialDelaySeconds: 30
-            tcpSocket:
-              port: 3306
-            timeoutSeconds: 1
-          name: mysql
-          ports:
-          - containerPort: 3306
-          readinessProbe:
-            exec:
-              command:
-              - /bin/sh
-              - -i
-              - -c
-              - MYSQL_PWD="$MYSQL_PASSWORD" mysql -h 127.0.0.1 -u $MYSQL_USER -D $MYSQL_DATABASE
-                -e 'SELECT 1'
-            initialDelaySeconds: 5
-            timeoutSeconds: 1
-          volumeMounts:
-          - mountPath: /var/lib/mysql/data
-            name: apolloportal-mysql-data
-        volumes:
-        - name: apolloportal-mysql-data
-          persistentVolumeClaim:
-            claimName: apolloportal-mysql
-    triggers:
-    - type: ConfigChange
-
 - apiVersion: v1
   kind: DeploymentConfig
   metadata:
@@ -222,7 +136,7 @@ objects:
           - name: CONFIGSERVICE_REGISTRY_TO_EUREKA_PORT
             value: "8080"
           - name: CONFIGSERVICEDB
-            value: apolloconfig-mysql.cicd.svc
+            value: apollo-mysql.cicd.svc
           - name: CONFIGSERVICEDB_PORT
             value: "3306"
           - name: CONFIGSERVICEDB_USER
@@ -237,7 +151,7 @@ objects:
           - name: ADMINSERVICE_REGISTRY_TO_EUREKA_PORT
             value: "8090"
           - name: ADMINSERVICEDB
-            value: apolloconfig-mysql.cicd.svc
+            value: apollo-mysql.cicd.svc
           - name: ADMINSERVICEDB_PORT
             value: "3306"
           - name: ADMINSERVICEDB_USER
@@ -300,7 +214,7 @@ objects:
         containers:
         - env:
           - name: PORTALDB
-            value: apolloportal-mysql.cicd.svc
+            value: apollo-mysql.cicd.svc
           - name: PORTALDB_PORT
             value: "3306"
           - name: PORTALDB_USER
