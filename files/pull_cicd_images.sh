@@ -19,7 +19,9 @@ CICD_IMAGES=(gitlab/gitlab-ce:11.4.0-ce.0 \
 	curiouser/dubbo_zookeeper:v1 \
 	blackcater/easy-mock:1.6.0 \
 	mongo:4.1 \
-	redis:5)
+	redis:5 \
+	xhuaustc/apolloconfigadmin:latest \
+	xhuaustc/apolloportal:latest)
 
 for image in "${CICD_IMAGES[@]}"
 do

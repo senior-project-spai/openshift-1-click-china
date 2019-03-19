@@ -51,7 +51,7 @@ objects:
             env:
               - name: ZOOKEEPER_SERVICE
                 value: ${ZOOKEEPER_SERVICE}
-            imagePullPolicy: Always
+            imagePullPolicy: IfNotPresent
             name: apache-dubbo
             ports:
               - containerPort: 8080
@@ -74,7 +74,7 @@ objects:
               - >-
                 zkServer.sh start
             image: 'docker.io/curiouser/dubbo_zookeeper:v1'
-            imagePullPolicy: Always
+            imagePullPolicy: IfNotPresent
             ports:
               - containerPort: 2181
                 protocol: TCP
@@ -91,7 +91,7 @@ objects:
               timeoutSeconds: 1
         dnsPolicy: ClusterFirst
         hostname: dubbo-zookeeper
-        restartPolicy: Always
+        restartPolicy: IfNotPresent
         schedulerName: default-scheduler
         securityContext: {}
         terminationGracePeriodSeconds: 30
