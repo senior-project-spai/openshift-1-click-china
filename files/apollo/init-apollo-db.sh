@@ -1,5 +1,5 @@
 #!/bin/sh
-apolloconfigdb_count=$(mysql -uroot ApolloConfigDB -e "show tables" | wc -l)
+apolloconfigdb_count=$(mysql ${mysql_flags} ApolloConfigDB -e "show tables" | wc -l)
 if [ $apolloconfigdb_count -eq 0 ]
 then
 	curl https://gitee.com/xhua/OpenshiftOneClick/raw/3.11/files/apollo/apolloconfigdb.sql -O
