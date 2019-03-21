@@ -64,6 +64,8 @@ openshift_hosted_registry_storage_nfs_options='*(rw,root_squash)'
 openshift_hosted_registry_storage_volume_name=registry
 openshift_hosted_registry_storage_volume_size=10Gi
 
+openshift_nfs_share_directory=/exports/pv-share
+
 [masters]
 {{ HOSTNAME }}
 [etcd]
