@@ -38,6 +38,8 @@
     - "{{ openshift_logging_storage_nfs_directory }}/{{ openshift_logging_storage_volume_name }}"
     - "{{ openshift_loggingops_storage_nfs_directory }}/{{ openshift_loggingops_storage_volume_name }}"
     - "{{ openshift_hosted_etcd_storage_nfs_directory }}/{{ openshift_hosted_etcd_storage_volume_name }}"
+    - "{{ openshift_hosted_etcd_storage_nfs_directory }}/{{ openshift_hosted_etcd_storage_volume_name }}"
+    - "{{ openshift_nfs_share_directory }}"
 
 - name: Configure exports
   template:
