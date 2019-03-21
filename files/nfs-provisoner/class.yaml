@@ -6,4 +6,4 @@ metadata:
     storageclass.kubernetes.io/is-default-class: "true" 
 provisioner: fuseim.pri/ifs
 parameters:
-  archiveOnDelete: "false"
+  archiveOnDelete: "true"
