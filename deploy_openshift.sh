@@ -35,6 +35,8 @@ ansible-playbook playbooks/deploy_cluster.yml
 oc adm policy add-cluster-role-to-user cluster-admin admin
 
 cd $current_path
+
+ansible-playbook playbook.yml --tags install_nfs
 ansible-playbook playbook.yml --tags after_task
 
 

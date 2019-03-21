@@ -11,7 +11,10 @@
     - include: tasks/common_set.yml
 
     - include: tasks/install.yml
-
+    
+    - include: tasks/install_nfs_provisoner.yml
+      tags: install_nfs
+      
     - include: tasks/after_install.yml
       tags: after_task
 
