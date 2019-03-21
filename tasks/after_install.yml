@@ -4,36 +4,21 @@
   
 - name: Ensure export directories exist
   file:
-    path: "/exports/pv{{ item }}"
+    path: "/exports/pv-share"
     state: directory
     mode: 0777
     owner: nfsnobody
     group: nfsnobody
-  loop: "{{ range(0, PV_COUNT)|list }}"
   
 - name: set exports
   template: src='./templates/nfs_exports.j2' dest='/etc/exports.d/openshift-pvs.exports'
   notify:
     - restart nfs-server
+- name: init nfs deployment file
+  template: src='./templates/nfs_deployment.yaml.j2' dest='./files/nfs-provisoner/deployment.yaml'
 
-- name: Ensure pvs directories exist
-  file:
-    path: "./pvs"
-    state: directory
-    mode: 0777
-
-- name: create pv file
-  template: src='./templates/nfs_pv.yaml.j2' dest="./pvs/nfs_pv_{{ item }}.yml"
-  loop: "{{ range(0, PV_COUNT)|list }}"
-
-- name: create pv
-  shell: oc get pv pv{{ item }}; if [ $? -gt 0 ]; then oc create -f ./pvs/nfs_pv_{{ item }}.yml; fi
-  loop: "{{ range(0, PV_COUNT) | list }}"
-
-- name: Delete pvs
-  file:
-    path: "./pvs"
-    state: absent
+- name: create nfs provisoner
+  script: ./files/install_nfs_provisoner.sh
 
 - name: init openshift cicd
   script: ./files/init_openshift.sh

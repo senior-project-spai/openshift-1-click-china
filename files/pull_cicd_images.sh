@@ -1,5 +1,6 @@
 #!/bin/bash
-CICD_IMAGES=(gitlab/gitlab-ce:11.4.0-ce.0 \
+CICD_IMAGES=(xhuaustc/nfs-client-provisioner:latest \
+	gitlab/gitlab-ce:11.4.0-ce.0 \
 	redis:3.2.3-alpine \
 	centos/postgresql-95-centos7:latest \
 	openshiftdemos/gogs:0.11.34 \
