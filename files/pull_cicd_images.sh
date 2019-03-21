@@ -22,7 +22,8 @@ CICD_IMAGES=(gitlab/gitlab-ce:11.4.0-ce.0 \
 	redis:5 \
 	tomcat:8.5-alpine \
 	xhuaustc/apolloconfigadmin:latest \
-	xhuaustc/apolloportal:latest)
+	xhuaustc/apolloportal:latest \
+	memcached:1.5)
 
 for image in "${CICD_IMAGES[@]}"
 do
