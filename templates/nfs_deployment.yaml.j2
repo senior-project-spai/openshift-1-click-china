@@ -14,7 +14,7 @@ spec:
       serviceAccountName: nfs-client-provisioner
       containers:
         - name: nfs-client-provisioner
-          image: docker.io/xhuaustc/nfs-client-provisioner:latest
+          image: xhuaustc/nfs-client-provisioner:latest
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - name: nfs-client-root

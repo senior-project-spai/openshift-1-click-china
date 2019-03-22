@@ -24,7 +24,8 @@ CICD_IMAGES=(xhuaustc/nfs-client-provisioner:latest \
 	tomcat:8.5-alpine \
 	xhuaustc/apolloconfigadmin:latest \
 	xhuaustc/apolloportal:latest \
-	memcached:1.5)
+	memcached:1.5 \
+	centos/nginx-112-centos7:latest)
 
 for image in "${CICD_IMAGES[@]}"
 do
