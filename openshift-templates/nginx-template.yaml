@@ -141,16 +141,6 @@ parameters:
   name: NAME
   required: true
   value: nginx-example
-- description: The OpenShift Namespace where the ImageStream resides.
-  displayName: Namespace
-  name: NAMESPACE
-  required: true
-  value: openshift
-- description: Version of NGINX image to be used (1.12 by default).
-  displayName: NGINX Version
-  name: NGINX_VERSION
-  required: true
-  value: "1.12"
 - description: Maximum amount of memory the container can use.
   displayName: Memory Limit
   name: MEMORY_LIMIT
