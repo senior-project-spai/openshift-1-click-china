@@ -1,5 +1,8 @@
 #!/bin/bash
-CICD_IMAGES=(xhuaustc/nfs-client-provisioner:latest \
+CICD_IMAGES=(
+	openshift/origin-node:v3.11.0 \
+	openshift/origin-pod:v3.11.0 \
+	xhuaustc/nfs-client-provisioner:latest \
 	gitlab/gitlab-ce:11.4.0-ce.0 \
 	redis:3.2.3-alpine \
 	centos/postgresql-95-centos7:latest \
