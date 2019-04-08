@@ -9,6 +9,12 @@
     - httpd-tools
     - python-passlib
     - mariadb
+    - dnsmasq
+
+- name: set dbus dnsmasq config
+  shell: sed -i "s/deny/allow/g" /etc/dbus-1/system.d/dnsmasq.conf && systemctl daemon-reload
+  notify:
+    - restart dbus
 
 - name: Set tmp/htpasswd
   shell: "htpasswd -bc /tmp/htpasswd admin admin"
