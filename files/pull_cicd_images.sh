@@ -28,6 +28,8 @@ CICD_IMAGES=(
 	xhuaustc/apolloconfigadmin:latest \
 	xhuaustc/apolloportal:latest \
 	memcached:1.5 \
+	perconalab/proxysql-openshift:0.5 \
+	perconalab/pxc-openshift:latest \
 	centos/nginx-112-centos7:latest)
 
 for image in "${CICD_IMAGES[@]}"
