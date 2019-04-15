@@ -13,8 +13,8 @@
 
 .icon-nexus3{
   background-image: url(https://xhua-static.sh1a.qingstor.com/allinone/nexus3.png);
-  width: 80px;
-  height: 80px;
+  width: 60px;
+  height: 60px;
   background-size: 100% 100%;
 }
 
@@ -27,22 +27,22 @@
 
 .icon-kelk{
   background-image: url(https://xhua-static.sh1a.qingstor.com/allinone/kelk.png);
-  width: 70px;
-  height: 42px;
+  width: 60px;
+  height: 36px;
   background-size: 100% 100%;
 }
 
 .icon-kafka{
   background-image: url(https://xhua-static.sh1a.qingstor.com/allinone/kafka.png);
-  width: 70px;
-  height: 35px;
+  width: 58px;
+  height: 29px;
   background-size: 100% 100%;
 }
 
 .icon-dubbo{
   background-image: url(https://xhua-static.sh1a.qingstor.com/allinone/dubbo.png);
-  width: 72px;
-  height: 18px;
+  width: 56px;
+  height: 14px;
   background-size: 100% 100%;
 }
 
@@ -62,7 +62,7 @@
 
 .icon-pxc{
   background-image: url(https://xhua-static.sh1a.qingstor.com/allinone/pxc.png);
-  width: 62px;
-  height: 62px;
+  width: 58px;
+  height: 58px;
   background-size: 100% 100%;
 }
