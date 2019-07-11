@@ -68,8 +68,7 @@ objects:
           - mountPath: /var/lib/ldap
             name: openldap-volume-2
         restartPolicy: Always
-        serviceAccount: openldap
-        serviceAccountName: openldap
+        serviceAccount: cicd
         volumes:
         - persistentVolumeClaim:
             claimName: openldap-volume-1
