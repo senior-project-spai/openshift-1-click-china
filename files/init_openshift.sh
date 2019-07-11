@@ -1,6 +1,6 @@
 #!/bin/bash
 OPENSHIFT_TEMPLATE_DIR='./openshift-templates'
-CICD_TEMPLATES=(gogs gitlab nexus3 sonarqube easymock kelk zalenium apollo)
+CICD_TEMPLATES=(gogs gitlab nexus3 sonarqube easymock kelk zalenium apollo openldap)
 OPENSHIFT_TEMPLATES=(redis-persistent postgresql-persistent mysql-persistent jenkins-ephemeral rabbitmq kafka mongodb dubbo memcached nginx pxc)
 
 # create project CI
