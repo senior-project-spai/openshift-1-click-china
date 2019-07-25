@@ -4,10 +4,10 @@ message: |-
   OpenLDAP服务将会根据指定的参数创建
 metadata:
   annotations:
+    iconClass: icon-openldap 
     description: |-
       OpenLDAP服务将会根据指定的参数创建
   name: openldap
-  iconClass: icon-openldap 
   openshift.io/display-name: OpenLDAP
   openshift.io/documentation-url: https://www.openldap.org/
   openshift.io/provider-display-name: Red Hat, Inc.
