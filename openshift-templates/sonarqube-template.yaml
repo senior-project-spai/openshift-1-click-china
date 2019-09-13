@@ -75,7 +75,7 @@ objects:
             value: jdbc:postgresql://postgresql-sonarqube/sonar
           - name: SONARQUBE_JDBC_USERNAME
             value: sonar
-          image: openshiftdemos/sonarqube:${SONARQUBE_VERSION}
+          image: xhuaustc/sonarqube:${SONARQUBE_VERSION}
           imagePullPolicy: IfNotPresent
           name: sonarqube
           ports:
@@ -252,7 +252,7 @@ objects:
         storage: ${SONAR_VOLUME_CAPACITY}
 parameters:
 - displayName: SonarQube version
-  value: "6.7"
+  value: "7.9.1"
   name: SONARQUBE_VERSION
   required: true
 - description: Password for SonarQube Server PostgreSQL backend
