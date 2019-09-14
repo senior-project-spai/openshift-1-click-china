@@ -27,10 +27,7 @@ objects:
           deploymentconfig: ${SERVICE_NAME}
       spec:
         containers:
-        - env:
-          - name: CONTEXT_PATH
-            value: /
-          image: docker.io/sonatype/nexus3:${NEXUS_VERSION}
+        - image: docker.io/sonatype/nexus3:${NEXUS_VERSION}
           imagePullPolicy: IfNotPresent
           livenessProbe:
             exec:
@@ -125,7 +122,7 @@ parameters:
 - displayName: Sonatype Nexus version
   name: NEXUS_VERSION
   required: true
-  value: 3.14.0
+  value: 3.18.1
 - description: Volume space available for Sonatype Nexus e.g. 512Mi, 2Gi
   displayName: Volume Space for Nexus
   name: VOLUME_CAPACITY
