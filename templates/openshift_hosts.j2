@@ -49,7 +49,7 @@ template_service_broker_install=false
 
 openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider'}]
 openshift_master_htpasswd_file=/tmp/htpasswd
-openshift_docker_options="-l warn --ipv6=false --insecure-registry=0.0.0.0/0 --registry-mirror=https://r03u9tep.mirror.aliyuncs.com  --log-opt max-size=1M --log-opt max-file=3"
+openshift_docker_options="-l warn --ipv6=false --insecure-registry=0.0.0.0/0 --registry-mirror=https://r03u9tep.mirror.aliyuncs.com  --log-opt max-size=1M --log-opt max-file=3 --live-restore=true"
 openshift_disable_check=memory_availability,disk_availability,package_availability,package_update,docker_image_availability,docker_storage_driver,docker_storage
 openshift_master_default_subdomain=apps.{{ HOSTNAME }}
 openshift_logging_es_ops_nodeselector={"node-role.kubernetes.io/infra":"true"}
